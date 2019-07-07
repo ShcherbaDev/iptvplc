@@ -15,12 +15,12 @@ router.get('/:hash', (req, res) => {
 			headers: {
 				'Content-Type': 'application/json'
 			}
-		})	
-			.then((response) => response.json())
+		})
+			.then(response => response.json())
 			.then(async (userData) => {
 				const { unsubscription_date } = userData;
 
-				// Если была исчерпана подписка - выводить картинку со шреком
+				// Если была исчерпана подписка - выводить картинку
 				if (new Date(Date.now()) >= new Date(unsubscription_date)) {
 					res.redirect('/static/images/expiredSubscribe.jpg');
 				}

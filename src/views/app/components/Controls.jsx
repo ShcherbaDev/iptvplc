@@ -9,19 +9,19 @@ class Controls extends Component {
 	}
 	
 	onMovePlaylistItemToUserPlaylist() {
-		Object.keys(this.props.appStore.defaultPlaylist).forEach((playlistName) => {
+		Object.keys(this.props.appStore.playlistCreatorReducer.defaultPlaylist).forEach((playlistName) => {
 			// If was found
-			if (this.props.appStore.defaultPlaylist[playlistName].findIndex((item) => item.id === this.props.appStore.selectedPlaylistItems) !== -1) {
-				const playlistItemIndex = this.props.appStore.defaultPlaylist[playlistName].findIndex((item) => item.id === this.props.appStore.selectedPlaylistItems);
-				return this.props.onMovePlaylistItemToUserPlaylist(this.props.appStore.defaultPlaylist[playlistName][playlistItemIndex]);
+			if (this.props.appStore.playlistCreatorReducer.defaultPlaylist[playlistName].findIndex((item) => item.id === this.props.appStore.playlistCreatorReducer.selectedPlaylistItems) !== -1) {
+				const playlistItemIndex = this.props.appStore.playlistCreatorReducer.defaultPlaylist[playlistName].findIndex((item) => item.id === this.props.appStore.playlistCreatorReducer.selectedPlaylistItems);
+				return this.props.onMovePlaylistItemToUserPlaylist(this.props.appStore.playlistCreatorReducer.defaultPlaylist[playlistName][playlistItemIndex]);
 			}
 		});
 	}
 
 	onMovePlaylistItemToDefaultPlaylist() {
 		// Find playlist item in user playlist
-		const itemIndexInPlaylist = this.props.appStore.userPlaylist.findIndex(item => item.id === this.props.appStore.selectedPlaylistItems);
-		const itemInPlaylist = this.props.appStore.userPlaylist[itemIndexInPlaylist];
+		const itemIndexInPlaylist = this.props.appStore.playlistCreatorReducer.userPlaylist.findIndex(item => item.id === this.props.appStore.playlistCreatorReducer.selectedPlaylistItems);
+		const itemInPlaylist = this.props.appStore.playlistCreatorReducer.userPlaylist[itemIndexInPlaylist];
 
 		if (itemIndexInPlaylist !== -1) {
 			this.props.onMovePlaylistItemToDefaultPlaylist(itemInPlaylist);
@@ -29,7 +29,7 @@ class Controls extends Component {
 	}
 
 	onPressingSaveButton(event) {
-		saveUserPlaylist(this.props.appStore.userPlaylist);
+		saveUserPlaylist(this.props.appStore.playlistCreatorReducer.userPlaylist);
 	}
 
 	render() {
@@ -43,7 +43,7 @@ class Controls extends Component {
 					<button className="btn btn-outline-primary" onClick={this.onMovePlaylistItemToDefaultPlaylist.bind(this)}>&lt;</button>
 				</div>
 				<div className="bottom">
-					<button className="btn btn-success" disabled={this.props.appStore.userPlaylist.length === 0} onClick={this.onPressingSaveButton.bind(this)}>Save</button>
+					<button className="btn btn-success" disabled={this.props.appStore.playlistCreatorReducer.userPlaylist.length === 0} onClick={this.onPressingSaveButton.bind(this)}>Save</button>
 				</div>
 			</div>
 		);

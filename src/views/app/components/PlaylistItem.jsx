@@ -29,7 +29,7 @@ class PlaylistItem extends Component {
 
 		return (
 			<li
-				className={`playlist_item${this.props.appStore.selectedPlaylistItems === this.props.item.id ? ' selected' : ''}`} 
+				className={`playlist_item${this.props.appStore.playlistCreatorReducer.selectedPlaylistItems === this.props.item.id ? ' selected' : ''}`} 
 				ref={this.domObj}
 				draggable="true"
 				onDragStart={this.onDragStart.bind(this)}

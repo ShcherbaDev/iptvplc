@@ -62,11 +62,20 @@ class RegistrationSubpage extends Component {
 		});
 	}
 
-	checkExistingUsername(event) {
+	getCookie(name) {
+		let cookie = {};
+		document.cookie.split(';').forEach((e) => {
+			let [key, value] = e.split('=');
+			cookie[key.trim()] = value;
+		});
+		return cookie[name] || null;
+	}
+
+	submitForm(event) {
 		event.preventDefault();
 
 		fetchApi(`user/${this.state.login}`)
-			.then((data) => {
+			.then(async (data) => {
 				const isEmpty = () => {
 					for (let key in data) {
 						if (data.hasOwnProperty(key)) {
@@ -78,17 +87,25 @@ class RegistrationSubpage extends Component {
 
 				// If user with typed login that isn't exist
 				if (isEmpty()) {
+					const submitObj = {
+						registrationLoginField: this.state.login,
+						registrationEmailField: this.state.email,
+						registrationPasswordField: this.state.password,
+						registrationConfirmPasswordField: this.state.repeatedPassword
+					};
+
+					const referralUsername = this.getCookie('referral');
+
+					if (referralUsername !== null) {
+						submitObj.referralUsername = referralUsername;
+					}
+
 					fetch('/register', {
 						method: 'POST',
 						headers: {
 							'Content-Type': 'application/json'
 						},
-						body: JSON.stringify({
-							registrationLoginField: this.state.login,
-							registrationEmailField: this.state.email,
-							registrationPasswordField: this.state.password,
-							registrationConfirmPasswordField: this.state.repeatedPassword
-						})
+						body: JSON.stringify(submitObj)
 					});
 				}
 				else {
@@ -137,7 +154,8 @@ class RegistrationSubpage extends Component {
 					</div>
 
 					<div className="confirm-btn-container">
-						<button className="btn btn-block btn-outline-success" onClick={(event) => this.checkExistingUsername(event)} disabled={!this.state.isLoginValid || !this.state.isEmailValid || !this.state.isPasswordValid || this.state.password !== this.state.repeatedPassword}>Зарегистрироватся</button>
+						{/* <button className="btn btn-block btn-outline-success" onClick={(event) => this.checkExistingUsername(event)} disabled={!this.state.isLoginValid || !this.state.isEmailValid || !this.state.isPasswordValid || this.state.password !== this.state.repeatedPassword}>Зарегистрироватся</button> */}
+						<button className="btn btn-block btn-outline-success" onClick={(event) => this.submitForm(event)}>Зарегистрироватся</button>
 					</div>
 				</form>
 			</div>

@@ -6,7 +6,7 @@ const db = require('../database/db');
 const nodemailer = require('../modules/nodemailer');
 
 router.get('/', (req, res) => {
-		res.render('index');
+	res.render('index');
 });
 
 router.get('/app', (req, res) => {
@@ -22,11 +22,35 @@ router.get('/register', (req, res) => {
 });
 
 router.post('/register', (req, res) => {
+	function registerUser(query, fields) {
+		return new Promise((resolve, reject) => {
+			db.query(query, fields, (queryErr) => {
+				if (queryErr) {
+					reject(queryErr);
+				}
+
+				resolve(fields);
+			});
+		});
+	}
+
+	function sendEmail(email, userActivationHash) {
+		nodemailer.sendMail({
+			from: 'andrey_shcherba@ukr.net',
+			to: email,
+			subject: 'Подтверждение аккаунта',
+			text: `Пожалуйста, подтвердите свой аккаунт по данной ссылке: http://localhost:3000/activate/${userActivationHash}\n------------\nС уважением,\nАдминистрация сайта http://localhost:3000`
+		});
+
+		res.redirect('/app');
+	}
+
 	const {
 		registrationLoginField,
 		registrationEmailField,
 		registrationPasswordField,
-		registrationConfirmPasswordField
+		registrationConfirmPasswordField,
+		referralUsername
 	} = req.body;
 
 	db.query(`SELECT * FROM users WHERE username='${registrationLoginField}'`, (findUserErr, val) => {
@@ -54,25 +78,35 @@ router.post('/register', (req, res) => {
 						const userPassword = hash;
 						const userActivationHash = crypto.randomBytes(20).toString('hex');
 
-						const newUserQuery = 'INSERT INTO `users` (username, password, email, ip, registration_date, subscription_date, unsubscription_date, activation_hash) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
 						const CURRENT_TIMESTAMP = { toSqlString: () => 'CURRENT_TIMESTAMP()' };
-						const NEXT_YEAR = { toSqlString: () => 'DATE_ADD(CURRENT_TIMESTAMP(), INTERVAL 3 DAY)' };
+						const DEMO_TIME = { toSqlString: () => 'DATE_ADD(CURRENT_TIMESTAMP(), INTERVAL 3 DAY)' };
 						const USER_IP = { toSqlString: () => `INET_ATON('${req.connection.remoteAddress}')` };
 
-						db.query(newUserQuery, [registrationLoginField, userPassword, registrationEmailField, USER_IP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, NEXT_YEAR, userActivationHash], ((queryErr) => {
-							if (queryErr) {
-								throw new Error(queryErr);
-							}
+						const queryArgs = [registrationLoginField, userPassword, registrationEmailField, USER_IP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, DEMO_TIME, userActivationHash];
 
-							nodemailer.sendMail({
-								from: 'andrey_shcherba@ukr.net',
-								to: registrationEmailField,
-								subject: 'Подтверждение аккаунта',
-								text: `Пожалуйста, подтвердите свой аккаунт по данной ссылке: http://localhost:3000/activate/${userActivationHash}\n------------\nС уважением,\nАдминистрация сайта http://localhost:3000`
+						let referralId;
+
+						if (referralUsername !== undefined) {
+							db.query('SELECT `id` FROM `users` WHERE `username` = ?', referralUsername, (referralError, referralData) => {
+								if (referralError) {
+									throw new Error(referralError);
+								}
+								referralId = referralData[0].id;
+
+								queryArgs.push(referralId);
+
+								registerUser(
+									'INSERT INTO `users` (username, password, email, ip, registration_date, subscription_date, unsubscription_date, activation_hash, referralId) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+									queryArgs
+								).then(() => sendEmail(registrationEmailField, userActivationHash));
 							});
-
-							res.redirect('/app');
-						}));
+						}
+						else {
+							registerUser(
+								'INSERT INTO `users` (username, password, email, ip, registration_date, subscription_date, unsubscription_date, activation_hash) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+								queryArgs
+							).then(() => sendEmail(registrationEmailField, userActivationHash));
+						}
 					});
 				});
 			}
@@ -84,6 +118,16 @@ router.post('/register', (req, res) => {
 });
 
 router.get('/activate/:hash', (req, res) => {
+	function loginUser(userData) {
+		req.login(userData, (loginErr) => {
+			if (loginErr) {
+				throw new Error(loginErr);
+			}
+
+			res.redirect('/app');
+		});
+	}
+
 	db.query(`SELECT * FROM users WHERE activation_hash = '${req.params.hash}'`, (err, val) => {
 		if (err) {
 			throw new Error(err);
@@ -95,13 +139,18 @@ router.get('/activate/:hash', (req, res) => {
 					throw new Error(error);
 				}
 
-				req.login(val[0], (loginErr) => {
-					if (loginErr) {
-						throw new Error(loginErr);
-					}
-
-					res.redirect('/app');
-				});
+				// Если пользователь зарегистрировался через реферальную ссылку - добавить реферу 1 день подписки
+				if (val[0].referralId !== null) {
+					db.query(`UPDATE \`users\` SET \`unsubscription_date\` = DATE_ADD(unsubscription_date, INTERVAL 1 DAY) WHERE \`id\` = ${val[0].referralId}`, (updateErr) => {
+						if (updateErr) {
+							throw new Error(updateErr);
+						}
+						loginUser(val[0]);
+					});
+				}
+				else {
+					loginUser(val[0]);
+				}
 			});
 		}
 		else {
@@ -115,13 +164,30 @@ router.get('/user/:idOrUsername', (req, res) => {
 });
 
 router.get('/admin', (req, res) => {
-	res.render('index');
-	// if (req.user !== undefined && req.user[0].isAdmin === 1) {
-	// 	res.render('index');
-	// }
-	// else {
-	// 	res.sendStatus(403);
-	// }
+	if (req.user !== undefined && req.user[0].isAdmin === 1) {
+		res.render('index');
+	}
+	else {
+		res.sendStatus(403);
+	}
+});
+
+router.get('/referral/:username', (req, res) => {
+	if (req.user !== undefined) {
+		res.redirect('/app');
+	}
+	else {
+		db.query(`SELECT username FROM users WHERE username = '${req.params.username}'`, (err, val) => {
+			if (err) {
+				throw new Error(err);
+			}
+
+			if (val[0] !== undefined) {
+				res.cookie('referral', val[0].username);
+			}
+			res.redirect('/');
+		});
+	}
 });
 
 module.exports = router;

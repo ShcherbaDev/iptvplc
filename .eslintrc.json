@@ -30,6 +30,7 @@
         "no-useless-escape": "off",
         "max-len": "off",
         "no-restricted-globals": "off",
+        "camelcase": "off",
 
         "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
         "react/jsx-indent": ["error", "tab"]

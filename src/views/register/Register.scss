@@ -14,11 +14,38 @@
 		border-top: 0;
 		border-radius: 0 0 .25rem .25rem;
 		
-		p.rules {
+		.rules-block {
+			color: #fff;
 			margin: 5px 0;
 			padding: 5px 10px;
-			max-height: 460px;
+			height: 460px;
 			overflow: auto;
+			font-family: monospace;
+
+			ul {
+				margin-left: 20px;
+
+				list-style: decimal;
+				counter-reset: first-counter;
+
+				li {
+					counter-increment: first-counter;
+
+					ul {
+						margin-left: 0;
+						list-style: none;
+						counter-reset: second-counter;
+
+						li {
+							counter-increment: second-counter;
+						}
+
+						li::before {
+							content: counter(first-counter) "." counter(second-counter) " ";
+						}
+					}
+				}
+			}
 		}
 		
 		.rules-confirm {

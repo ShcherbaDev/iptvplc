@@ -10,19 +10,6 @@ class LoginForm extends Component {
 		};
 	}
 
-	// submitForm(event) {
-	// 	event.preventDefault();
-
-	// 	fetch('/api/login', {
-	// 		method: 'POST',
-			
-	// 		body: JSON.stringify({
-	// 			username: this.state.username,
-	// 			password: this.state.password
-	// 		})
-	// 	});
-	// }
-
 	setLogin(event) {
 		this.setState({
 			username: event.target.value
