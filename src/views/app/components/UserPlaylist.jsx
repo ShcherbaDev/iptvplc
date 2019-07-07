@@ -16,7 +16,7 @@ class UserPlaylist extends Component {
 		const transferredPlaylistItem = JSON.parse(event.dataTransfer.getData('playlistItem'));
 
 		// If draggable item isn't exist in necessary playlist
-		if (this.props.appStore.userPlaylist.findIndex(item => item.id === transferredPlaylistItem.id) === -1) {
+		if (this.props.appStore.playlistCreatorReducer.userPlaylist.findIndex(item => item.id === transferredPlaylistItem.id) === -1) {
 			this.props.onMovePlaylistItemToUserPlaylist(transferredPlaylistItem);
 		}
 	}
@@ -24,7 +24,7 @@ class UserPlaylist extends Component {
 	render() {
 		const list = [];
 
-		this.props.appStore.userPlaylist.map((item) => {
+		this.props.appStore.playlistCreatorReducer.userPlaylist.map((item) => {
 			list.push(
 				<PlaylistItem key={item.id} item={item}></PlaylistItem>
 			);

@@ -1,17 +1,17 @@
 export default async function parseM3uToJson(path) {
 	const request = await fetch(`${path}`);
-	let response = await request.text();
+	const response = await request.text();
 
-	let result = response.match(/#EXTINF:(.*?) tvg-logo="(.*?)",(.*)\n#EXTGRP:(.*)\n(.*)/gm);
+	const splittedPlaylistItems = response.match(/#EXTINF:(.*?) tvg-logo="(.*?)",(.*)\n#EXTGRP:(.*)\n(.*)/gm);
 
-	let completedResult = {};
+	const result = {};
 
-	result.forEach((item, index) => {
+	splittedPlaylistItems.forEach((item, index) => {
 		const parsedPlaylistItem = /#EXTINF:(\1-?[0-9]*) tvg-logo="(\2.*?)",(\3.*)\n#EXTGRP:(\4.*)\n(\5.*)/gm.exec(item);
 
 		/**
 		 * Array items of parsedPlaylistItem
-		 * 
+		 *
 		 * 0 - Not parsed playlist item string
 		 * 1 - Playlist item duration
 		 * 2 - Playlist item icon
@@ -20,12 +20,12 @@ export default async function parseM3uToJson(path) {
 		 * 5 - Path to playlist item for play
 		 */
 
-		if (Object.keys(completedResult).findIndex((item) => item === parsedPlaylistItem[4]) === -1) {
-			completedResult[parsedPlaylistItem[4]] = [];
+		if (Object.keys(result).findIndex(resultObjectItem => resultObjectItem === parsedPlaylistItem[4]) === -1) {
+			result[parsedPlaylistItem[4]] = [];
 		}
 
-		if (completedResult[parsedPlaylistItem[4]].findIndex((item) => item === parsedPlaylistItem) === -1) {
-			completedResult[parsedPlaylistItem[4]].push({
+		if (result[parsedPlaylistItem[4]].findIndex(groupItem => groupItem === parsedPlaylistItem) === -1) {
+			result[parsedPlaylistItem[4]].push({
 				id: index,
 				inf: {
 					title: parsedPlaylistItem[3],
@@ -37,6 +37,6 @@ export default async function parseM3uToJson(path) {
 			});
 		}
 	});
-	
-	return completedResult;
+
+	return result;
 }

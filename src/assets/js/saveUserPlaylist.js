@@ -1,11 +1,11 @@
-import isUserLoggedIn from './isUserLoggedIn';
 import crypto from 'crypto-js';
+import isUserLoggedIn from './isUserLoggedIn';
 
 export default function saveUserPlaylist(userPlaylist) {
 	if (userPlaylist.length > 0) {
 		isUserLoggedIn()
 			.then((data) => {
-				const {isLoggedIn, username} = data;
+				const { isLoggedIn, username } = data;
 
 				if (isLoggedIn) {
 					let m3uContent = '#EXTM3U';

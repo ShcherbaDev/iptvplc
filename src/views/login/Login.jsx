@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import './Login.scss';
 
 import Card from '../../components/Card/Card';
-import LoginForm from '../../components/Header/LoginForm/LoginForm';
+import LoginForm from '../../components/LoginForm/LoginForm';
 
 class Login extends Component {
 	constructor(props) {
