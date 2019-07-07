@@ -1,0 +1,21 @@
+.card-container {
+	display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-content: center;
+    height: 100%;
+    
+    .card {
+        border-color: rgba(0, 0, 0, .69);
+        
+        .card-header {
+            background-color: rgba(0, 0, 0, .76);
+            color: #fff;
+        }
+    
+        .card-body {
+            background-color: rgba(0, 0, 0, .75);
+            padding: 15px 1.25rem;
+        }
+    }
+}

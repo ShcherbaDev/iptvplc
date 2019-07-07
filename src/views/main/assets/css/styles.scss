@@ -1,0 +1,192 @@
+@import './fontawesome.min.css';
+@import './fonts.css';
+@import './keyframes.css';
+@import './media.css';
+
+* {
+	margin: 0;
+	padding: 0;
+}
+
+html.langing, html.landing body {
+	width: auto !important;
+	height: auto !important;
+}
+
+section, .container, .container > .row {
+	width: 100%;
+	height: 100%;
+}
+
+.row {
+	margin: 0;
+}
+
+#root {
+	padding-top: 0 !important;
+}
+
+img.app-logo {
+	filter: drop-shadow(0 0 5px #1E9F27);
+}
+
+.btn-outline-success:hover {
+	background-color: transparent !important;
+	box-shadow: 0 0 5px #1E9F27 !important;
+	color: #43BF4C !important;
+}
+
+section {
+	h1.section-title, p, blockquote {
+		color: #fff;
+	}
+
+	.container {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+	}
+}
+
+/* Nav */
+ul.nav {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	z-index: 999;
+
+	li {
+		position: relative;
+	}
+
+	li:not(:last-child)::after {
+		position: absolute;
+		content: "";
+		height: 60%;
+		width: 1px;
+		background-color: #aaa;
+		right: 0;
+		top: 20%;
+	}
+
+	a {
+		color: #fff;
+		padding: 10px 15px;
+	}
+
+	a:hover {
+		color: #eee;
+		background-color: rgba(255, 255, 255, .1);
+	}
+}
+
+/* Main section */
+section.main {
+	display: flex;
+	min-height: 100vh;
+	align-items: center;
+
+	overflow: hidden;
+
+	.logo {
+		display: flex;
+		justify-content: center;
+
+		.app-logo {
+			width: 330px;
+		}
+	}
+
+	.app-description {
+		padding: 0;
+
+		.title {
+			color: #fff;
+			font-size: 46px;
+			line-height: 54px;		
+		}
+
+		.about-btn {
+			display: inline-block;
+			margin-top: 21px;
+
+			button {
+				padding: 6px 20px;
+			}
+		}
+
+		.sign-in {
+			color: #ddd;
+			margin-top: 5px;
+			font-size: 16px;
+			text-align: center;
+
+			a {
+				margin-left: 5px;
+			}
+		}
+	}
+
+	.background {
+		width: 100%;
+		height: 100%;
+
+		position: absolute;
+		top: 0;
+
+		overflow: hidden;
+		z-index: -1;
+
+		.background-image {
+			position: relative;
+			top: 0px;
+
+			width: 100%;
+			height: 2552px;
+
+			background: url(../images/channelList.png) rgba(24, 24, 24, 0.9);
+			background-blend-mode: overlay;
+
+			animation: scrollBg;
+			animation-duration: 30s;
+			animation-timing-function: linear;
+			animation-iteration-count: infinite;
+
+			filter: blur(2px);
+		}
+	}
+}
+
+section:not(.main) {
+	display: flex;
+	align-items: center;
+	min-height: 100vh;
+	background-color: #202020;
+	padding: 25px 0;
+
+	.section-content {
+		margin-top: 20px;
+		color: #fff;
+	}
+}
+
+section.tariffs {
+	position: relative;
+	overflow: hidden;
+
+	.container {
+		z-index: 1;
+	}
+
+	h2.subscription-price,
+	h3.subscription-duration {
+		color: #fff;
+	}
+}
+
+section.contact {
+	.section-content {
+		margin-top: 0;
+	}
+}

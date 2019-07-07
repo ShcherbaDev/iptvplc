@@ -1,0 +1,55 @@
+.container.registration {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	justify-content: center;
+
+	color: #fff;
+
+	.card-part {
+		display: none;
+
+		height: 600px;
+		overflow: auto;
+		border-top: 0;
+		border-radius: 0 0 .25rem .25rem;
+		
+		p.rules {
+			margin: 5px 0;
+			padding: 5px 10px;
+			max-height: 460px;
+			overflow: auto;
+		}
+		
+		.rules-confirm {
+			margin-bottom: 5px;
+		}
+
+		.card-part-content {
+			overflow: auto;
+			height: calc(100% - 69px);
+		
+			.rules {
+				background-color: rgba(24, 24, 24, .2);
+			}
+		}
+
+		.confirm-btn-container {
+			position: absolute;
+			bottom: 0;
+			left: 0;
+			right: 0;
+			padding: 15px;
+			background-color: rgba(55, 55, 55, 0.76);
+			border-top: 1px solid rgba(0, 0, 0, 0.125);
+
+			button {
+				cursor: pointer;
+			}
+		}
+	}
+
+	.card-part.active {
+		display: block;
+	}
+}
