@@ -1,0 +1,20 @@
+@media screen and (min-width: 992px) {
+	section.main > .container > .row {
+		align-items: center;
+	}
+
+	section.main .logo {
+		height: 100%;
+	}
+}
+
+@media screen and (max-width: 991px) {
+	section.main .logo {
+		align-items: flex-end;
+		margin-bottom: 40px;
+	}
+
+	section.main .app-description .title {
+		text-align: center;
+	}
+}
