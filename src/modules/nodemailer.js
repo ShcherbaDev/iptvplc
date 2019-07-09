@@ -8,8 +8,9 @@ const transporter = nodemailer.createTransport({
 		rejectUnauthorized: false
 	},
 	auth: {
-		user: 'andrey_shcherba@ukr.net',
-		pass: 'XqVAL6YgcweVIZQo'
+		// TODO: потом поменять
+		user: 'iptvplc@gmail.com',
+		pass: 'GyNzmtWSJJBVQpTY'
 	}
 });
 

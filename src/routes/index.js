@@ -1,9 +1,11 @@
 const router = require('express').Router();
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
+const fetch = require('node-fetch').default;
 
 const db = require('../database/db');
 const nodemailer = require('../modules/nodemailer');
+const validateCaptcha = require('../modules/validateCaptcha');
 
 router.get('/', (req, res) => {
 	res.render('index');
@@ -21,7 +23,16 @@ router.get('/register', (req, res) => {
 	res.render('index');
 });
 
-router.post('/register', (req, res) => {
+router.get('/register/success', (req, res) => {
+	if (req.user === undefined) {
+		res.render('index');
+	}
+	else {
+		res.redirect('/app');
+	}
+})
+
+router.post('/register', async (req, res) => {
 	function registerUser(query, fields) {
 		return new Promise((resolve, reject) => {
 			db.query(query, fields, (queryErr) => {
@@ -35,14 +46,12 @@ router.post('/register', (req, res) => {
 	}
 
 	function sendEmail(email, userActivationHash) {
-		nodemailer.sendMail({
-			from: 'andrey_shcherba@ukr.net',
+		return nodemailer.sendMail({
+			from: 'iptvplc@gmail.com',
 			to: email,
 			subject: 'Подтверждение аккаунта',
 			text: `Пожалуйста, подтвердите свой аккаунт по данной ссылке: http://localhost:3000/activate/${userActivationHash}\n------------\nС уважением,\nАдминистрация сайта http://localhost:3000`
 		});
-
-		res.redirect('/app');
 	}
 
 	const {
@@ -50,21 +59,25 @@ router.post('/register', (req, res) => {
 		registrationEmailField,
 		registrationPasswordField,
 		registrationConfirmPasswordField,
-		referralUsername
+		referralUsername,
+		captchaResponse
 	} = req.body;
 
-	db.query(`SELECT * FROM users WHERE username='${registrationLoginField}'`, (findUserErr, val) => {
-		if (findUserErr) {
-			throw new Error(findUserErr);
-		}
+	const captchaResponseObject = await validateCaptcha(captchaResponse);
 
-		// If user wasn't found
-		if (val.length === 0) {
-			if (
-				registrationLoginField.length >= 4 && !/^\d+$/.test(registrationLoginField.charAt(0)) // Login
-				&& /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(registrationEmailField) // Email
-				&& registrationPasswordField === registrationConfirmPasswordField // Password
-			) {
+	if (
+		registrationLoginField.length >= 4 && !/^\d+$/.test(registrationLoginField.charAt(0)) // Login
+		&& /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(registrationEmailField) // Email
+		&& registrationPasswordField === registrationConfirmPasswordField // Password
+		&& captchaResponseObject.success // Captcha
+	) {
+		db.query(`SELECT * FROM users WHERE username='${registrationLoginField}'`, (findUserErr, val) => {
+			if (findUserErr) {
+				throw new Error(findUserErr);
+			}
+
+			// If user wasn't found
+			if (val.length === 0) {
 				bcrypt.genSalt(10, (err, salt) => {
 					if (err) {
 						throw new Error(err);
@@ -85,7 +98,6 @@ router.post('/register', (req, res) => {
 						const queryArgs = [registrationLoginField, userPassword, registrationEmailField, USER_IP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, DEMO_TIME, userActivationHash];
 
 						let referralId;
-
 						if (referralUsername !== undefined) {
 							db.query('SELECT `id` FROM `users` WHERE `username` = ?', referralUsername, (referralError, referralData) => {
 								if (referralError) {
@@ -107,14 +119,19 @@ router.post('/register', (req, res) => {
 								queryArgs
 							).then(() => sendEmail(registrationEmailField, userActivationHash));
 						}
+
+						res.redirect(307, '/register/success');
 					});
 				});
 			}
-		}
-		else {
-			res.render('index');
-		}
-	});
+			else {
+				res.render('index');
+			}
+		});
+	}
+	else {
+		res.render('index');
+	}
 });
 
 router.get('/activate/:hash', (req, res) => {
@@ -141,20 +158,32 @@ router.get('/activate/:hash', (req, res) => {
 
 				// Если пользователь зарегистрировался через реферальную ссылку - добавить реферу 1 день подписки
 				if (val[0].referralId !== null) {
-					db.query(`UPDATE \`users\` SET \`unsubscription_date\` = DATE_ADD(unsubscription_date, INTERVAL 1 DAY) WHERE \`id\` = ${val[0].referralId}`, (updateErr) => {
-						if (updateErr) {
-							throw new Error(updateErr);
+					db.query(`SELECT id, active FROM users WHERE referralId = ${val[0].referralId}`, (referralErr, values) => {
+						if (referralErr) {
+							throw new Error(referralErr);
 						}
-						loginUser(val[0]);
+
+						let activeUsersCount = 0;
+						for (let i in values) {
+							if (values[i].active === 1) {
+								activeUsersCount += 1;
+							}
+						}
+
+						if (activeUsersCount > 0 && activeUsersCount % 5 === 0) {
+							db.query(`UPDATE \`users\` SET \`unsubscription_date\` = DATE_ADD(unsubscription_date, INTERVAL 1 MONTH) WHERE \`id\` = ${val[0].referralId}`, (updateErr) => {
+								if (updateErr) {
+									throw new Error(updateErr);
+								}
+								loginUser(val[0]);
+							});
+						}
 					});
 				}
 				else {
 					loginUser(val[0]);
 				}
 			});
-		}
-		else {
-			res.redirect('/');
 		}
 	});
 });
@@ -164,12 +193,13 @@ router.get('/user/:idOrUsername', (req, res) => {
 });
 
 router.get('/admin', (req, res) => {
-	if (req.user !== undefined && req.user[0].isAdmin === 1) {
-		res.render('index');
-	}
-	else {
-		res.sendStatus(403);
-	}
+	res.render('index');
+	// if (req.user !== undefined && req.user[0].isAdmin === 1) {
+	// 	res.render('index');
+	// }
+	// else {
+	// 	res.sendStatus(403);
+	// }
 });
 
 router.get('/referral/:username', (req, res) => {

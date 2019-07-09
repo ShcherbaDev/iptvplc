@@ -41,7 +41,8 @@ class Header extends Component {
 	shouldShowHeader() {
 		return window.location.pathname !== '/' 
 			&& window.location.pathname !== '/login' 
-			&& window.location.pathname !== '/register';
+			&& window.location.pathname !== '/register'
+			&& window.location.pathname !== '/register/success';
 	}
 
 	render() {

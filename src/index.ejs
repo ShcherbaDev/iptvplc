@@ -13,6 +13,30 @@
 	<link rel="mask-icon" href="./static/images/favicon/safari-pinned-tab.svg" color="#1ead2a">
 	<meta name="msapplication-TileColor" content="#00a300">
 	<meta name="theme-color" content="#215f2c">
+
+	<script>
+		var onloadCallback = function() {
+			let captchaDomElementId;
+
+			switch (window.location.pathname) {
+				case '/':
+					captchaDomElementId = 'submitFormCaptcha';
+					break;	
+
+				case '/register':
+					captchaDomElementId = 'captcha';
+					break;
+
+				default:
+					return false;
+			}
+
+			grecaptcha.render(captchaDomElementId, {
+				'sitekey': '6Ldcl6wUAAAAAPk7Rccd9rBw-rrHbACb_PPs-Ahh',
+				'theme': 'dark'
+			});
+		};
+	</script>
 </head>
 <body>
 	<div id="root"></div>
@@ -30,5 +54,6 @@
 			</div>
 		</div>
 	</noscript>
+	<script src="https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit" async defer></script>
 </body>
 </html>
