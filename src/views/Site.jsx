@@ -42,7 +42,7 @@ class Site extends Component {
 
 					<Route path="/app" render={() => this.state.isUserLoggedIn ? <App /> : <Redirect to="/" />} />
 					<Route path="/login" component={Login} />
-					<Route path="/register" component={Register} />
+					<Route path={["/register", "/register/success"]} component={Register} />
 					<Route path="/user/:username" render={() => this.state.isUserLoggedIn ? <User /> : <Redirect to="/" />} />
 					<Route path="/admin" component={Admin} />
 				</Switch>

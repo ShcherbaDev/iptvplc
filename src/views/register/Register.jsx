@@ -6,6 +6,7 @@ import Card from '../../components/Card/Card';
 
 import RulesSubpage from './components/RulesSubpage';
 import RegistrationSubpage from './components/RegistrationSubpage';
+import SuccessfulRegistrationSubpage from './components/SuccessfulRegistrationSubpage';
 
 class Register extends Component {
 	constructor(props) {
@@ -18,6 +19,14 @@ class Register extends Component {
 		this.rulesSubpageRef = React.createRef();
 	}
 
+	componentWillMount() {
+		if (window.location.pathname === '/register/success') {
+			this.setState({
+				currentTab: 'success'
+			});
+		}
+	}
+
 	setNewActiveTab(tabName) {
 		if (tabName !== 'registration' || (tabName === 'registration' && this.rulesSubpageRef.current.state.rulesConfirmed)) {
 			this.setState({ currentTab: tabName });
@@ -28,8 +37,9 @@ class Register extends Component {
 		return (
 			<div className="registration container">
 				<Card title="Регистрация">
-					<RulesSubpage currentTab={this.state.currentTab} onConfirm={this.setNewActiveTab.bind(this)} ref={this.rulesSubpageRef}></RulesSubpage>
-					<RegistrationSubpage currentTab={this.state.currentTab}></RegistrationSubpage>
+					<RulesSubpage currentTab={this.state.currentTab} onConfirm={this.setNewActiveTab.bind(this)} ref={this.rulesSubpageRef} />
+					<RegistrationSubpage currentTab={this.state.currentTab} />
+					<SuccessfulRegistrationSubpage currentTab={this.state.currentTab} />
 				</Card>
 			</div>
 		);

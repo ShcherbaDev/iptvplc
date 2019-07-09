@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 
 import fetchApi from '../../../assets/js/fetchApi';
 
@@ -91,7 +91,8 @@ class RegistrationSubpage extends Component {
 						registrationLoginField: this.state.login,
 						registrationEmailField: this.state.email,
 						registrationPasswordField: this.state.password,
-						registrationConfirmPasswordField: this.state.repeatedPassword
+						registrationConfirmPasswordField: this.state.repeatedPassword,
+						captchaResponse: grecaptcha.getResponse()
 					};
 
 					const referralUsername = this.getCookie('referral');
@@ -106,10 +107,14 @@ class RegistrationSubpage extends Component {
 							'Content-Type': 'application/json'
 						},
 						body: JSON.stringify(submitObj)
-					});
+					})
+						.then(() => window.location.href = '/register/success');
 				}
 				else {
-					this.setState({ loginError: `Пользователь с именем "${this.state.login}" уже существует!`, isLoginValid: false });
+					this.setState({
+						loginError: `Пользователь с именем "${this.state.login}" уже существует!`,
+						isLoginValid: false
+					});
 				}
 			});
 	}
@@ -151,11 +156,12 @@ class RegistrationSubpage extends Component {
 								Пароль не совпадают.
 							</div>
 						</div>
+
+						<div id="captcha"></div>
 					</div>
 
 					<div className="confirm-btn-container">
-						{/* <button className="btn btn-block btn-outline-success" onClick={(event) => this.checkExistingUsername(event)} disabled={!this.state.isLoginValid || !this.state.isEmailValid || !this.state.isPasswordValid || this.state.password !== this.state.repeatedPassword}>Зарегистрироватся</button> */}
-						<button className="btn btn-block btn-outline-success" onClick={(event) => this.submitForm(event)}>Зарегистрироватся</button>
+						<button className="btn btn-block btn-outline-success" onClick={(event) => this.submitForm(event)} disabled={!this.state.isLoginValid || !this.state.isEmailValid || !this.state.isPasswordValid || this.state.password !== this.state.repeatedPassword}>Зарегистрироватся</button>
 					</div>
 				</form>
 			</div>
