@@ -103,8 +103,8 @@ class User extends Component {
 		);
 
 		return (
-			<div className="content container">
-				<Card title={`Личный кабинет ${this.state.userData.username}`} style={{ height: 541 }}>
+			<div className="container content">
+				<Card title={`Личный кабинет пользователя ${this.state.userData.username}`}>
 					{globalAccountData}
 					{subscribeData}
 				</Card>

@@ -1,5 +1,3 @@
-@import './fontawesome.min.css';
-@import './fonts.css';
 @import './keyframes.css';
 @import './media.css';
 
@@ -158,11 +156,14 @@ section.main {
 	}
 }
 
+section:not(.main):not(.tariffs) {
+	background-color: #202020;
+}
+
 section:not(.main) {
 	display: flex;
 	align-items: center;
 	min-height: 100vh;
-	background-color: #202020;
 	padding: 25px 0;
 
 	.section-content {
@@ -182,6 +183,25 @@ section.tariffs {
 	h2.subscription-price,
 	h3.subscription-duration {
 		color: #fff;
+	}
+
+	.section-background {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+	
+		background: url(../images/channelList.png) rgba(24, 24, 24, 0.9);
+		background-blend-mode: overlay;
+		background-size: cover;
+		background-position-x: -40px;
+		background-position-y: 45%;
+		background-repeat: repeat;
+
+		filter: blur(4px);
+	
+		z-index: -1;
 	}
 }
 

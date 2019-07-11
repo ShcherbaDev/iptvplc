@@ -2,7 +2,7 @@ const router = require('express').Router();
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const bcrypt = require('bcryptjs');
-const nodemailer = require('../modules/nodemailer');
+const mailManager = require('../modules/nodemailer');
 const validateCaptcha = require('../modules/validateCaptcha');
 
 const db = require('../database/db');
@@ -90,15 +90,19 @@ router.get('/user/:idOrUsername', (req, res) => {
 });
 
 // Mail
-router.post('/sendMail', async (req, res) => {
-	const { name, email, message, pageFrom } = req.body;
-	const subjectText = pageFrom === '/' ? `${name} отправил(-а) сообщение через форму обратной связи на главной странице` : `${name} отправил(-а) сообщение`;
+router.post('/sendMail', async (req) => {
+	const {
+		name, email, message, pageFrom
+	} = req.body;
+	const subjectText = pageFrom === '/' ? `${name} (${email}) отправил(-а) сообщение через форму обратной связи на главной странице` : `${name} (${email}) отправил(-а) сообщение`;
 
 	function sendMail() {
 		return new Promise((resolve, reject) => {
-			nodemailer.sendMail({
-				from: email,
-				to: 'iptvplc@gmail.com',
+			const { MAIL_USER } = process.env;
+
+			mailManager.sendMail({
+				from: MAIL_USER,
+				to: MAIL_USER,
 				subject: subjectText,
 				text: message
 			}, (err) => {
@@ -116,9 +120,7 @@ router.post('/sendMail', async (req, res) => {
 		if (captchaResponseObject.success) {
 			return sendMail();
 		}
-		else {
-			return new Promise(reject => reject(captchaResponseObject));
-		}
+		return new Promise(reject => reject(captchaResponseObject));
 	}
 	return sendMail();
 });

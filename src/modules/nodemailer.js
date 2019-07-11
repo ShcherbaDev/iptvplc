@@ -1,17 +1,24 @@
 const nodemailer = require('nodemailer');
 
-const transporter = nodemailer.createTransport({
-	host: 'smtp.ukr.net',
-	port: 2525,
-	secure: true,
-	tls: {
-		rejectUnauthorized: false
-	},
-	auth: {
-		// TODO: потом поменять
-		user: 'iptvplc@gmail.com',
-		pass: 'GyNzmtWSJJBVQpTY'
-	}
-});
+let transporter;
 
-module.exports = transporter;
+const { MAIL_HOST, MAIL_PORT, MAIL_USER, MAIL_PASS } = process.env;
+
+module.exports.create = () => {
+	transporter = nodemailer.createTransport({
+		host: MAIL_HOST,
+		port: MAIL_PORT,
+		secure: true,
+		tls: {
+			rejectUnauthorized: false
+		},
+		auth: {
+			user: MAIL_USER,
+			pass: MAIL_PASS
+		}
+	});
+};
+
+module.exports.sendMail = (options, callback) => {
+	transporter.sendMail(options, callback);
+};

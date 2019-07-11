@@ -1,10 +1,9 @@
 const router = require('express').Router();
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
-const fetch = require('node-fetch').default;
 
 const db = require('../database/db');
-const nodemailer = require('../modules/nodemailer');
+const mailManager = require('../modules/nodemailer');
 const validateCaptcha = require('../modules/validateCaptcha');
 
 router.get('/', (req, res) => {
@@ -30,7 +29,7 @@ router.get('/register/success', (req, res) => {
 	else {
 		res.redirect('/app');
 	}
-})
+});
 
 router.post('/register', async (req, res) => {
 	function registerUser(query, fields) {
@@ -46,11 +45,14 @@ router.post('/register', async (req, res) => {
 	}
 
 	function sendEmail(email, userActivationHash) {
-		return nodemailer.sendMail({
-			from: 'iptvplc@gmail.com',
+		const { APP_PROTOCOL, APP_DOMAIN, APP_PORT, MAIL_USER } = process.env;
+		const appDomain = `${APP_PROTOCOL}://${APP_DOMAIN}:${APP_PORT}`;
+
+		return mailManager.sendMail({
+			from: MAIL_USER,
 			to: email,
 			subject: 'Подтверждение аккаунта',
-			text: `Пожалуйста, подтвердите свой аккаунт по данной ссылке: http://localhost:3000/activate/${userActivationHash}\n------------\nС уважением,\nАдминистрация сайта http://localhost:3000`
+			text: `Пожалуйста, подтвердите свой аккаунт по данной ссылке: ${appDomain}/activate/${userActivationHash}\n------------\nС уважением,\nАдминистрация IPTVPLC`
 		});
 	}
 
@@ -158,17 +160,17 @@ router.get('/activate/:hash', (req, res) => {
 
 				// Если пользователь зарегистрировался через реферальную ссылку - добавить реферу 1 день подписки
 				if (val[0].referralId !== null) {
-					db.query(`SELECT id, active FROM users WHERE referralId = ${val[0].referralId}`, (referralErr, values) => {
+					db.query(`SELECT id, active FROM users WHERE referralId = ${val[0].referralId}`, (referralErr, users) => {
 						if (referralErr) {
 							throw new Error(referralErr);
 						}
 
 						let activeUsersCount = 0;
-						for (let i in values) {
-							if (values[i].active === 1) {
+						users.forEach((user) => {
+							if (user.active === 1) {
 								activeUsersCount += 1;
 							}
-						}
+						});
 
 						if (activeUsersCount > 0 && activeUsersCount % 5 === 0) {
 							db.query(`UPDATE \`users\` SET \`unsubscription_date\` = DATE_ADD(unsubscription_date, INTERVAL 1 MONTH) WHERE \`id\` = ${val[0].referralId}`, (updateErr) => {
@@ -188,18 +190,27 @@ router.get('/activate/:hash', (req, res) => {
 	});
 });
 
-router.get('/user/:idOrUsername', (req, res) => {
-	res.render('index');
+router.get('/user/:username', (req, res) => {
+	if (req.user !== undefined && req.user[0].username === req.params.username) {
+		res.render('index');
+	}
+	else {
+		res.redirect('/');
+	}
 });
 
 router.get('/admin', (req, res) => {
-	res.render('index');
-	// if (req.user !== undefined && req.user[0].isAdmin === 1) {
-	// 	res.render('index');
-	// }
-	// else {
-	// 	res.sendStatus(403);
-	// }
+	if (process.env.NODE_ENV === 'dev') {
+		res.render('index');
+	}
+	else {
+		if (req.user !== undefined && req.user[0].isAdmin === 1) {
+			res.render('index');
+		}
+		else {
+			res.sendStatus(403);
+		}
+	}
 });
 
 router.get('/referral/:username', (req, res) => {

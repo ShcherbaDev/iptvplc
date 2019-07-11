@@ -1,16 +1,19 @@
 const router = require('express').Router();
 const crypto = require('crypto-js');
-const fetch = require('node-fetch');
+const fetch = require('node-fetch').default;
 
-const importPlaylistPaths = require('../assets/js/playlistManager');
+const importPlaylistPaths = require('../assets/js/playlistManager').default;
 
 router.get('/:hash', (req, res) => {
+	const { APP_PROTOCOL, APP_DOMAIN, APP_PORT, APP_PLAYLIST_INDEX } = process.env;
+	const appDomain = `${APP_PROTOCOL}://${APP_DOMAIN}:${APP_PORT}`;
+
 	if (req.headers['content-type'] === undefined) {
 		const validHash = req.params.hash.replace('-', '+').replace('_', '/');
 		const parsedWordArray = crypto.enc.Base64.parse(validHash);
 		const parsedStr = parsedWordArray.toString(crypto.enc.Utf8).split('/');
 
-		fetch.default(`http://localhost:3000/api/user/${parsedStr[0]}`, {
+		fetch.default(`${appDomain}/api/user/${parsedStr[0]}`, {
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json'
@@ -25,9 +28,9 @@ router.get('/:hash', (req, res) => {
 					res.redirect('/static/images/expiredSubscribe.jpg');
 				}
 				else {
-					const playlistPaths = await importPlaylistPaths.default(true);
+					const playlistPaths = await importPlaylistPaths(true);
 
-					const playlistReq = await fetch.default(new URL(playlistPaths[0], 'http://localhost:3000'));
+					const playlistReq = await fetch(new URL(playlistPaths[APP_PLAYLIST_INDEX], appDomain));
 					const playlistRes = await playlistReq.text();
 
 					const playlistItemRegExp = new RegExp(/#EXTINF:(.*?),(.*?)$\n#EXTGRP:(.*?)$\n(.*)$/gm);

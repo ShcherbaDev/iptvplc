@@ -12,7 +12,7 @@ class Login extends Component {
 
 	render() {
 		return (
-			<div className="container login">
+			<div className="container content">
 				<Card title="Войти в аккаунт">
 					<LoginForm />
 				</Card>

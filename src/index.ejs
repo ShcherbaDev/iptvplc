@@ -32,8 +32,8 @@
 			}
 
 			grecaptcha.render(captchaDomElementId, {
-				'sitekey': '6Ldcl6wUAAAAAPk7Rccd9rBw-rrHbACb_PPs-Ahh',
-				'theme': 'dark'
+				'sitekey': '<%= process.env.CAPTCHA_SITE_KEY %>',
+				'theme': '<%= process.env.CAPTCHA_THEME %>'
 			});
 		};
 	</script>

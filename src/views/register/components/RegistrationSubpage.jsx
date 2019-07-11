@@ -1,4 +1,5 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
+import Card from '../../../components/Card/Card';
 
 import fetchApi from '../../../assets/js/fetchApi';
 
@@ -120,51 +121,47 @@ class RegistrationSubpage extends Component {
 	}
 
 	render() {
+		const cardFooter = <button className="btn btn-block btn-outline-success" onClick={(event) => this.submitForm(event)} disabled={!this.state.isLoginValid || !this.state.isEmailValid || !this.state.isPasswordValid || this.state.password !== this.state.repeatedPassword}>Зарегистрироватся</button>;
+
 		return (
-			<div className={`card-part${this.props.currentTab === 'registration' ? ' active' : ''}`}>
+			<Card title="Регистрация" footer={cardFooter} className={this.props.currentTab === 'registration' ? 'active' : 'unactive'}>
 				<form action="/register" method="POST" noValidate>
-					<div className="card-part-content">
-						<div className={`form-group${this.state.isLoginValid ? '' : ' invalid'}`}>
-							<label htmlFor="registrationLoginField">Логин:</label>
-							<input type="text" className="form-control" id="registrationLoginField" name="registrationLoginField" required onChange={this.validateLogin.bind(this)} />
-							
-							<div className="invalid-feedback">
-								{this.state.loginError}
-							</div>
-						</div>
-						<div className={`form-group${this.state.isEmailValid ? '' : ' invalid'}`}>
-							<label htmlFor="registrationEmailField">Email:</label>
-							<input type="email" className="form-control" id="registrationEmailField" name="registrationEmailField" required onChange={this.validateEmail.bind(this)} />
+					<div className={`form-group${this.state.isLoginValid ? '' : ' invalid'}`}>
+						<label htmlFor="registrationLoginField">Логин:</label>
+						<input type="text" className="form-control" id="registrationLoginField" name="registrationLoginField" required onChange={this.validateLogin.bind(this)} />
 						
-							<div className="invalid-feedback">
-								Неверный формат электронной почты.
-							</div>
+						<div className="invalid-feedback">
+							{this.state.loginError}
 						</div>
-						<div className={`form-group${this.state.password.length >= 6 ? '' : ' invalid'}`}>
-							<label htmlFor="registrationPasswordField">Пароль:</label>
-							<input type="password" className="form-control" id="registrationPasswordField" name="registrationPasswordField" required onChange={this.validatePassword.bind(this)} />
-						
-							<div className="invalid-feedback">
-								Пароль должен быть хотя-бы 6 символов в длину.
-							</div>
+					</div>
+					<div className={`form-group${this.state.isEmailValid ? '' : ' invalid'}`}>
+						<label htmlFor="registrationEmailField">Email:</label>
+						<input type="email" className="form-control" id="registrationEmailField" name="registrationEmailField" required onChange={this.validateEmail.bind(this)} />
+					
+						<div className="invalid-feedback">
+							Неверный формат электронной почты.
 						</div>
-						<div className={`form-group${this.state.password === this.state.repeatedPassword ? '' : ' invalid'}`}>
-							<label htmlFor="registrationConfirmPasswordField">Подтверждение пароля:</label>
-							<input type="password" className="form-control" id="registrationConfirmPasswordField" name="registrationConfirmPasswordField" required onChange={this.validateRepeatedPassword.bind(this)} />
-						
-							<div className="invalid-feedback">
-								Пароль не совпадают.
-							</div>
+					</div>
+					<div className={`form-group${this.state.password.length >= 6 ? '' : ' invalid'}`}>
+						<label htmlFor="registrationPasswordField">Пароль:</label>
+						<input type="password" className="form-control" id="registrationPasswordField" name="registrationPasswordField" required onChange={this.validatePassword.bind(this)} />
+					
+						<div className="invalid-feedback">
+							Пароль должен быть хотя-бы 6 символов в длину.
 						</div>
-
-						<div id="captcha"></div>
+					</div>
+					<div className={`form-group${this.state.password === this.state.repeatedPassword ? '' : ' invalid'}`}>
+						<label htmlFor="registrationConfirmPasswordField">Подтверждение пароля:</label>
+						<input type="password" className="form-control" id="registrationConfirmPasswordField" name="registrationConfirmPasswordField" required onChange={this.validateRepeatedPassword.bind(this)} />
+					
+						<div className="invalid-feedback">
+							Пароль не совпадают.
+						</div>
 					</div>
 
-					<div className="confirm-btn-container">
-						<button className="btn btn-block btn-outline-success" onClick={(event) => this.submitForm(event)} disabled={!this.state.isLoginValid || !this.state.isEmailValid || !this.state.isPasswordValid || this.state.password !== this.state.repeatedPassword}>Зарегистрироватся</button>
-					</div>
+					<div id="captcha"></div>
 				</form>
-			</div>
+			</Card>
 		);
 	}
 }

@@ -15,12 +15,9 @@ class Contact extends Component {
 	
 	sendMail(event) {
 		event.preventDefault();
+		
 		const captchaResponse = grecaptcha.getResponse();
-		/**
-		 * Как тебе такое, Илон Маск?
 
-😉(╯‵□′)╯︵┻━┻
-		 */
 		if (captchaResponse !== '') {
 			const { name, email, message } = this.state;
 
@@ -31,13 +28,7 @@ class Contact extends Component {
 					name, email, message, captchaResponse,
 					pageFrom: '/'
 				})
-			})
-				.then(() => {
-					alert('Сообщение было успешно отправлено!');
-				})
-				.catch(() => {
-					alert('При отправке сообщения произошла ошибка!\nПожалуйста, попробуйте ещё раз.');
-				});
+			});
 		}
 		else {
 			alert('Для отправки сообщения, пожалуйста, пройдите капчу.');

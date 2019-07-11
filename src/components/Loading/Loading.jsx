@@ -11,7 +11,7 @@ class Loading extends Component {
 		return (
 			<div className="loading">
 				<span className="spinner spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-				Loading...
+				Загрузка...
 			</div>
 		);
 	}

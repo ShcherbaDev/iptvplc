@@ -78,7 +78,7 @@ class DefaultPlaylist extends Component {
 			ref="scrollBlock"
 			onDragOver={this.onDragOver}
 				onDrop={this.onDrop.bind(this)}>
-				{this.state.isLoading ? <Loading></Loading> : (
+				{this.state.isLoading ? <Loading /> : (
 					<Fragment>
 						<select value={Object.keys(this.props.appStore.playlistCreatorReducer.defaultPlaylist)[this.state.playlistItemsGroupId]} onChange={this.changePlaylistGroup.bind(this)}>
 							{groupOptions}
