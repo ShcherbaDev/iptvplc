@@ -1,10 +1,12 @@
 const mysql = require('mysql');
 
+const { DB_HOST, DB_DATABASE, DB_USER, DB_PASS } = process.env;
+
 const connection = mysql.createPool({
-	host: '127.0.0.1',
-	user: 'root',
-	password: '',
-	database: 'iptv_constructor_test',
+	host: DB_HOST,
+	user: DB_USER,
+	password: DB_PASS,
+	database: DB_DATABASE,
 	dateStrings: true
 });
 

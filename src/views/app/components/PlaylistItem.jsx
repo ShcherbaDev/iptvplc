@@ -16,7 +16,7 @@ class PlaylistItem extends Component {
 		event.dataTransfer.setData('playlistItem', JSON.stringify(this.props.item));
 	}
 
-	onSelectPlaylistItem(event) {
+	onSelectPlaylistItem() {
 		this.props.onSelect(this.props.item.id);
 	}
 

@@ -2,6 +2,7 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const NodemonPlugin = require('nodemon-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const Dotenv = require('dotenv-webpack');
 
 module.exports = {
 	mode: 'development',
@@ -102,6 +103,10 @@ module.exports = {
 		new NodemonPlugin({
 			watch: path.resolve('./dist'),
 			script: './dist/server.js'
+		}),
+
+		new Dotenv({
+			path: './environments/.env.development'
 		})
 	]
 }

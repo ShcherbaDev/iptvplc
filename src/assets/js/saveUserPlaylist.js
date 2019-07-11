@@ -16,7 +16,7 @@ export default function saveUserPlaylist(userPlaylist) {
 
 						const playlistItemHash = crypto.enc.Base64.stringify(crypto.enc.Utf8.parse(`${username}/${title}`)).replace('+', '-').replace('/', '_');
 
-						m3uContent += `\n#EXTINF:${duration},${title}\n#EXTGRP:${group}\nhttp://localhost:3000/playlist/${playlistItemHash}`;
+						m3uContent += `\n#EXTINF:${duration},${title}\n#EXTGRP:${group}\n${window.location.origin}/playlist/${playlistItemHash}`;
 					});
 
 					const m3uData = `data:audio/x-mpegurl;charset=utf-8,${encodeURIComponent(m3uContent)}`;

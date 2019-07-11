@@ -2,8 +2,6 @@ import React, { Component } from 'react';
 
 import './Register.scss';
 
-import Card from '../../components/Card/Card';
-
 import RulesSubpage from './components/RulesSubpage';
 import RegistrationSubpage from './components/RegistrationSubpage';
 import SuccessfulRegistrationSubpage from './components/SuccessfulRegistrationSubpage';
@@ -35,12 +33,10 @@ class Register extends Component {
 
 	render() {
 		return (
-			<div className="registration container">
-				<Card title="Регистрация">
-					<RulesSubpage currentTab={this.state.currentTab} onConfirm={this.setNewActiveTab.bind(this)} ref={this.rulesSubpageRef} />
-					<RegistrationSubpage currentTab={this.state.currentTab} />
-					<SuccessfulRegistrationSubpage currentTab={this.state.currentTab} />
-				</Card>
+			<div className="container content">
+				<RulesSubpage currentTab={this.state.currentTab} onConfirm={this.setNewActiveTab.bind(this)} ref={this.rulesSubpageRef} />
+				<RegistrationSubpage currentTab={this.state.currentTab} />
+				<SuccessfulRegistrationSubpage currentTab={this.state.currentTab} />
 			</div>
 		);
 	}

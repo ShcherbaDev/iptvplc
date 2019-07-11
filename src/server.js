@@ -12,7 +12,9 @@ const indexRouter = require('./routes/index');
 const apiRouter = require('./routes/api');
 const playlistRouter = require('./routes/playlist');
 
-const port = process.env.PORT || 3000;
+const mailManager = require('./modules/nodemailer');
+
+const port = process.env.APP_PORT || 3000;
 
 app.enable('trust proxy');
 
@@ -40,6 +42,8 @@ app.set('views', path.join(__dirname));
 app.set('view options', {
 	layout: false
 });
+
+mailManager.create();
 
 app.listen(port, () => {
 	console.log(`App listening on port ${port}\nPress Ctrl+C to quit.`);

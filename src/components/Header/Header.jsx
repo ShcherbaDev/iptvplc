@@ -1,5 +1,4 @@
-import React, { Component, Fragment } from 'react';
-import { Link } from 'react-router-dom';
+import React, { Component } from 'react';
 
 import './Header.scss';
 
@@ -55,16 +54,16 @@ class Header extends Component {
 				<div className="collapse navbar-collapse" id="navbarToggle">
 					<ul className="navbar-nav mr-auto mt-2 mt-lg-0">
 						<li className="nav-item">
-							<Link to="/" className="nav-link">Главная</Link>
+							<a href="/" className="nav-link">Главная</a>
 						</li>
 						<li className="nav-item">
-							<Link to="#" className="nav-link">Обратная связь</Link>
+							<a href="#" className="nav-link">Обратная связь</a>
 						</li>
 					</ul>
 
 					<div className="mt-2 mt-lg-0">
 						<Dropdown style={{ padding: 10 }} id="user-controls" title={this.state.username === null ? <span>Войти / Зарегистрироватся</span> : this.state.username}>
-							<Link to={`user/${this.state.username}`} className="dropdown-item">Личный кабинет</Link>
+							<a href={`/user/${this.state.username}`} className="dropdown-item">Личный кабинет</a>
 							<a href="#" className="logout btn btn-danger btn-block" onClick={(event) => this.logout(event)}>Выйти</a>
 						</Dropdown>
 					</div>
