@@ -8,8 +8,8 @@ module.exports = {
 	mode: 'development',
 	devtool: 'cheap-module-source-map',
 	entry: {
-		bootstrap: './src/assets/js/bootstrap.bundle.min.js',
-		main: './src/assets/js/main.js',
+		'static/bootstrap': './src/assets/js/bootstrap.bundle.min.js',
+		'static/main': './src/assets/js/main.js',
 		server: './src/server.js'
 	},
 	output: {
@@ -96,7 +96,7 @@ module.exports = {
 			},
 
 			{
-				from: './src/playlists', to: './playlists'
+				from: './src/playlists', to: './static/playlists'
 			}
 		]),
 

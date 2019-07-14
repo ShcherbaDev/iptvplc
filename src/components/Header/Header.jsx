@@ -30,7 +30,8 @@ class Header extends Component {
 		fetch('/api/logout', {
 			method: 'GET',
 			headers: {
-				'Content-Type': 'application/json'
+				'Content-Type': 'application/json',
+				'Accept': 'application/json'
 			}
 		}).then(() => {
 			window.location.href = '/';

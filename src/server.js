@@ -1,5 +1,6 @@
 const express = require('express');
 const path = require('path');
+const cors = require('cors');
 
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
@@ -18,6 +19,7 @@ const port = process.env.APP_PORT || 3000;
 
 app.enable('trust proxy');
 
+app.use(cors());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
@@ -33,7 +35,12 @@ app.use(indexRouter);
 app.use('/api', apiRouter);
 app.use('/playlist', playlistRouter);
 
-app.use(express.static('dist'));
+if (process.env.NODE_ENV === 'dev') {
+	app.use(express.static('dist'));
+}
+else {
+	app.use('/static', express.static('static'));
+}
 
 app.engine('html', require('ejs').renderFile);
 

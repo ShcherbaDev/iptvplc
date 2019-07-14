@@ -15,7 +15,8 @@
 	<meta name="theme-color" content="#215f2c">
 
 	<script>
-		var onloadCallback = function() {
+		const node_env = '<%= process.env.NODE_ENV %>';
+		function onloadCallback() {
 			let captchaDomElementId;
 
 			switch (window.location.pathname) {
@@ -49,7 +50,7 @@
 			<div class="error-grid-item text" style="font-family: 'Arial', sans-serif;">
 				<h1 style="text-align: center">Ошибка!</h1>
 				<h2 style="text-align: center">У Вас выключен Javascript</h2>
-				<p>Приложение IPTVPLC использует Javascript как основной язык. Поскольку он у Вас выключен, мы не может отрисовывать приложение.</p>
+				<p>IPTVPLC использует Javascript как основной язык. Поскольку он у Вас выключен, мы не может отрисовывать приложение.</p>
 				<p>Подробнее о включении Javascript можно посмотреть <a href="https://support.google.com/adsense/answer/12654?hl=ru" target="_blank">тут</a></p>
 			</div>
 		</div>

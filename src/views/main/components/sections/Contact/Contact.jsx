@@ -23,7 +23,10 @@ class Contact extends Component {
 
 			fetch('/api/sendMail', {
 				method: 'POST',
-				headers: new Headers({ 'Content-Type': 'application/json' }),
+				headers: new Headers({
+					'Content-Type': 'application/json',
+					'Accept': 'application/json'
+				}),
 				body: JSON.stringify({
 					name, email, message, captchaResponse,
 					pageFrom: '/'

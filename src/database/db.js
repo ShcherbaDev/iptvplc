@@ -1,6 +1,8 @@
 const mysql = require('mysql');
 
-const { DB_HOST, DB_DATABASE, DB_USER, DB_PASS } = process.env;
+const {
+	DB_HOST, DB_DATABASE, DB_USER, DB_PASS
+} = process.env;
 
 const connection = mysql.createPool({
 	host: DB_HOST,

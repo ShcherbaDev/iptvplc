@@ -11,10 +11,10 @@ export default function saveUserPlaylist(userPlaylist) {
 					let m3uContent = '#EXTM3U';
 
 					userPlaylist.forEach((playlistItem) => {
-						const { inf } = playlistItem;
+						const { id, inf } = playlistItem;
 						const { title, group, duration } = inf;
 
-						const playlistItemHash = crypto.enc.Base64.stringify(crypto.enc.Utf8.parse(`${username}/${title}`)).replace('+', '-').replace('/', '_');
+						const playlistItemHash = crypto.enc.Base64.stringify(crypto.enc.Utf8.parse(`${username}/${id}`)).replace('+', '-').replace('/', '_');
 
 						m3uContent += `\n#EXTINF:${duration},${title}\n#EXTGRP:${group}\n${window.location.origin}/playlist/${playlistItemHash}`;
 					});

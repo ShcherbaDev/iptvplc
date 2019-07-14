@@ -27,7 +27,6 @@ class Site extends Component {
 		isUserLoggedIn()
 			.then((data) => {
 				if (data !== undefined) {
-					console.log(data)
 					this.setState({ isUserLoggedIn: data.isLoggedIn });
 				}
 			});
