@@ -29,16 +29,21 @@ passport.deserializeUser((user, done) => {
 	});
 });
 
+router.use((req, res, next) => {
+	res.set('Content-Type', 'application/json');
+	next();
+});
+
 // Login
 router.get('/login', (req, res) => {
 	if (req.user !== undefined) {
-		res.json({
+		res.send({
 			isLoggedIn: true,
 			...req.user[0]
 		});
 	}
 	else {
-		res.json({ isLoggedIn: false });
+		res.send({ isLoggedIn: false });
 	}
 });
 
@@ -85,7 +90,7 @@ router.get('/user/:idOrUsername', (req, res) => {
 		// If user is exist - set as database output, else - set as empty object
 		const jsonOutput = (value.length > 0) ? value[0] : {};
 
-		res.json(jsonOutput);
+		res.send(jsonOutput);
 	});
 });
 

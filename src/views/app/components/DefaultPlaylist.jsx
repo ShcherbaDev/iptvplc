@@ -67,7 +67,7 @@ class DefaultPlaylist extends Component {
 				<option key={index} value={groupName}>{groupName}</option>
 			);
 
-			list = this.props.appStore.playlistCreatorReducer.defaultPlaylist[playlistKeys[this.state.playlistItemsGroupId]].map((playlistItems) =>
+			list = this.props.appStore.playlistCreatorReducer.defaultPlaylist[playlistKeys[this.state.playlistItemsGroupId]].sort().map((playlistItems) =>
 				<PlaylistItem key={playlistItems.id} item={playlistItems} />
 			);
 		}

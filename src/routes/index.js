@@ -45,7 +45,9 @@ router.post('/register', async (req, res) => {
 	}
 
 	function sendEmail(email, userActivationHash) {
-		const { APP_PROTOCOL, APP_DOMAIN, APP_PORT, MAIL_USER } = process.env;
+		const {
+			APP_PROTOCOL, APP_DOMAIN, APP_PORT, MAIL_USER
+		} = process.env;
 		const appDomain = `${APP_PROTOCOL}://${APP_DOMAIN}:${APP_PORT}`;
 
 		return mailManager.sendMail({
@@ -200,17 +202,29 @@ router.get('/user/:username', (req, res) => {
 });
 
 router.get('/admin', (req, res) => {
-	if (process.env.NODE_ENV === 'dev') {
+	if (process.env.NODE_ENV === 'dev'
+		|| (
+			process.env.NODE_ENV !== 'dev'
+			&& req.user !== undefined
+			&& req.user[0].isAdmin === 1
+		)) {
 		res.render('index');
 	}
 	else {
-		if (req.user !== undefined && req.user[0].isAdmin === 1) {
-			res.render('index');
-		}
-		else {
-			res.sendStatus(403);
-		}
+		res.sendStatus(403);
 	}
+
+	// if (process.env.NODE_ENV === 'dev') {
+	// 	res.render('index');
+	// }
+	// else {
+	// 	if (req.user !== undefined && req.user[0].isAdmin === 1) {
+	// 		res.render('index');
+	// 	}
+	// 	else {
+	// 		res.sendStatus(403);
+	// 	}
+	// }
 });
 
 router.get('/referral/:username', (req, res) => {

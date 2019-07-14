@@ -20,7 +20,7 @@ const rootReducer = combineReducers({
 	playlistCreatorReducer
 });
 
-const store = createStore(rootReducer, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
+const store = createStore(rootReducer, node_env === 'dev' ? window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__() : emptyFunc => emptyFunc);
 
 ReactDOM.render(
 	<Provider store={store}>

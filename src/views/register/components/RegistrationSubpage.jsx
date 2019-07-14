@@ -105,7 +105,8 @@ class RegistrationSubpage extends Component {
 					fetch('/register', {
 						method: 'POST',
 						headers: {
-							'Content-Type': 'application/json'
+							'Content-Type': 'application/json',
+							'Accept': 'application/json'
 						},
 						body: JSON.stringify(submitObj)
 					})

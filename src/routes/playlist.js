@@ -5,7 +5,9 @@ const fetch = require('node-fetch').default;
 const importPlaylistPaths = require('../assets/js/playlistManager').default;
 
 router.get('/:hash', (req, res) => {
-	const { APP_PROTOCOL, APP_DOMAIN, APP_PORT, APP_PLAYLIST_INDEX } = process.env;
+	const {
+		APP_PROTOCOL, APP_DOMAIN, APP_PORT, APP_PLAYLIST_INDEX
+	} = process.env;
 	const appDomain = `${APP_PROTOCOL}://${APP_DOMAIN}:${APP_PORT}`;
 
 	if (req.headers['content-type'] === undefined) {
@@ -13,7 +15,7 @@ router.get('/:hash', (req, res) => {
 		const parsedWordArray = crypto.enc.Base64.parse(validHash);
 		const parsedStr = parsedWordArray.toString(crypto.enc.Utf8).split('/');
 
-		fetch.default(`${appDomain}/api/user/${parsedStr[0]}`, {
+		fetch(`${appDomain}/api/user/${parsedStr[0]}`, {
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json'
@@ -33,13 +35,12 @@ router.get('/:hash', (req, res) => {
 					const playlistReq = await fetch(new URL(playlistPaths[APP_PLAYLIST_INDEX], appDomain));
 					const playlistRes = await playlistReq.text();
 
-					const playlistItemRegExp = new RegExp(/#EXTINF:(.*?),(.*?)$\n#EXTGRP:(.*?)$\n(.*)$/gm);
+					const playlistItemRegExp = new RegExp(/#EXTINF:(.*?) tvg-logo=(.*?),(.*?)$\n#EXTGRP:(.*?)$\n(.*)$/gm);
+					playlistRes.match(playlistItemRegExp).forEach((item, index) => {
+						const parsedPlaylistItem = /#EXTINF:(\1-?[0-9]*) tvg-logo="(\2.*)",(\3.*)$\n#EXTGRP:(\4.*?)\n(\5.*)/gm.exec(item);
 
-					playlistRes.match(playlistItemRegExp).forEach((item) => {
-						const parsedPlaylistItem = /#EXTINF:(\1-?[0-9]*),(\2.*)$\n#EXTGRP:(\3.*?)\n(\4.*)/gm.exec(item);
-
-						if (parsedPlaylistItem[2] === parsedStr[1]) {
-							res.redirect(parsedPlaylistItem[4]);
+						if (index === parseInt(parsedStr[1], 10)) {
+							res.redirect(parsedPlaylistItem[5]);
 						}
 					});
 				}
