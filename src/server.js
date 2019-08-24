@@ -12,6 +12,7 @@ const app = express();
 const indexRouter = require('./routes/index');
 const apiRouter = require('./routes/api');
 const playlistRouter = require('./routes/playlist');
+const paymentRouter = require('./routes/payment');
 
 const mailManager = require('./modules/nodemailer');
 
@@ -34,6 +35,7 @@ app.use(passport.session());
 app.use(indexRouter);
 app.use('/api', apiRouter);
 app.use('/playlist', playlistRouter);
+app.use('/payment', paymentRouter);
 
 if (process.env.NODE_ENV === 'dev') {
 	app.use(express.static('dist'));

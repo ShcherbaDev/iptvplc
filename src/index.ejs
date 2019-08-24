@@ -6,23 +6,28 @@
 	<meta http-equiv="X-UA-Compatible" content="ie=edge">
 	<title><%= htmlWebpackPlugin.options.title %></title>
 
-	<link rel="apple-touch-icon" sizes="180x180" href="./static/images/favicon/apple-touch-icon.png">
-	<link rel="icon" type="image/png" sizes="32x32" href="./static/images/favicon/favicon-32x32.png">
-	<link rel="icon" type="image/png" sizes="16x16" href="./static/images/favicon/favicon-16x16.png">
-	<link rel="manifest" href="./static/images/favicon/site.webmanifest">
-	<link rel="mask-icon" href="./static/images/favicon/safari-pinned-tab.svg" color="#1ead2a">
+	<link rel="apple-touch-icon" sizes="180x180" href="/static/images/favicon/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="/static/images/favicon/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="/static/images/favicon/favicon-16x16.png">
+	<link rel="manifest" href="/static/images/favicon/site.webmanifest">
+	<link rel="mask-icon" href="/static/images/favicon/safari-pinned-tab.svg" color="#1ead2a">
 	<meta name="msapplication-TileColor" content="#00a300">
 	<meta name="theme-color" content="#215f2c">
 
 	<script>
 		const node_env = '<%= process.env.NODE_ENV %>';
+		const app_tariffs = JSON.parse('<%= process.env.APP_TARIFFS %>');
+		
+		const captcha_key = '<%= process.env.CAPTCHA_SITE_KEY %>';
+		const captcha_theme = '<%= process.env.CAPTCHA_THEME %>';
+
 		function onloadCallback() {
 			let captchaDomElementId;
 
 			switch (window.location.pathname) {
 				case '/':
 					captchaDomElementId = 'submitFormCaptcha';
-					break;	
+					break;
 
 				case '/register':
 					captchaDomElementId = 'captcha';
@@ -30,12 +35,15 @@
 
 				default:
 					return false;
+					break;
 			}
 
-			grecaptcha.render(captchaDomElementId, {
-				'sitekey': '<%= process.env.CAPTCHA_SITE_KEY %>',
-				'theme': '<%= process.env.CAPTCHA_THEME %>'
-			});
+			if (window.location.pathname === '/' || window.location.pathname === '/register') {
+				grecaptcha.render(captchaDomElementId, {
+					'sitekey': captcha_key,
+					'theme': captcha_theme
+				});
+			}
 		};
 	</script>
 </head>
@@ -45,7 +53,7 @@
 	<noscript>
 		<div class="error-container" style="display: flex; flex-direction: column; padding: 15vh 25%;">
 			<div class="error-grid-item logo" style="text-align: center;">
-				<img src="./static/images/iptvplc.svg" alt="Logotype of IPTVPLC" style="max-width: 200px;">
+				<img src="/static/images/iptvplc.svg" alt="Logotype of IPTVPLC" style="max-width: 200px;">
 			</div>
 			<div class="error-grid-item text" style="font-family: 'Arial', sans-serif;">
 				<h1 style="text-align: center">Ошибка!</h1>

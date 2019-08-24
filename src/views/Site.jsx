@@ -14,6 +14,9 @@ import Register from './register/Register';
 import User from './user/User';
 import Admin from './admin/Admin';
 
+import SuccessPayment from './payment/SuccessPayment';
+import PaymentError from './payment/PaymentError';
+
 class Site extends Component {
 	constructor(props) {
 		super(props);
@@ -45,6 +48,9 @@ class Site extends Component {
 					<Route path={["/register", "/register/success"]} component={Register} />
 					<Route path="/user/:username" component={User} />
 					<Route path="/admin" component={Admin} />
+
+					<Route path="/payment/success" component={SuccessPayment} />
+					<Route path="/payment/error" component={PaymentError} />
 				</Switch>
 
 				<div className="background"></div>

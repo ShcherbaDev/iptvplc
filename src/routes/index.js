@@ -48,7 +48,7 @@ router.post('/register', async (req, res) => {
 		const {
 			APP_PROTOCOL, APP_DOMAIN, APP_PORT, MAIL_USER
 		} = process.env;
-		const appDomain = `${APP_PROTOCOL}://${APP_DOMAIN}:${APP_PORT}`;
+		const appDomain = process.env.NODE_ENV === 'dev' ? `${APP_PROTOCOL}://${APP_DOMAIN}:${APP_PORT}` : `${APP_PROTOCOL}://${APP_DOMAIN}`;
 
 		return mailManager.sendMail({
 			from: MAIL_USER,

@@ -1,6 +1,7 @@
 import React, { Component, Fragment } from 'react';
 
 import Card from '../../components/Card/Card';
+import Modal from '../../components/Modal/Modal';
 
 import fetchApi from '../../assets/js/fetchApi';
 import isUserLoggedIn from '../../assets/js/isUserLoggedIn';
@@ -13,7 +14,8 @@ class User extends Component {
 			userData: {},
 			subscriptionExpireDate: '',
 			isSubscriptionExpired: false,
-			activeTab: 'global'
+			activeTab: 'global',
+			isModalOpened: false
 		};
 	}
 
@@ -96,15 +98,49 @@ class User extends Component {
 					</tbody>
 				</table>
 
-				{this.state.isSubscriptionExpired && (
-					<a className="btn btn-block btn-primary" href="#">Продлить подписку</a>
+				{new Date().getTime() - (new Date(this.state.userData.subscription_date).getTime()-60000) <= 300000 && (
+					<p style={{ marginTop: 20 }}>Подписка доступна только через 5 минут после предыдущей оплаты.</p>
+				)}
+
+				<button 
+					className="btn btn-block btn-outline-success extend-subscription-btn"
+					disabled={new Date().getTime() - (new Date(this.state.userData.subscription_date).getTime()-60000) <= 300000}
+					onClick={() => this.setState({ isModalOpened: true })}
+					style={{ marginTop: 15 }}>
+						Продлить подписку
+				</button>
+
+				{this.state.isModalOpened && (
+					<Modal title="Продлить подписку" onClose={() => this.setState({ isModalOpened: false })}>
+						<div className="alert alert-info">
+							<h4 className="alert-heading">Внимание!</h4>
+							После приобретения новой подписки перестанет действовать текущая подписка.
+						</div>
+						<div className="container-fluid">
+							<div className="row">
+								{app_tariffs.map((tariff, index) =>
+									<div className="col text-center" key={index.toString()}>
+										<h2>{tariff.duration} мес.</h2>
+										<h3>${tariff.price}</h3>
+
+										<a 
+											className="btn btn-block btn-outline-success"
+											href={`https://sci.interkassa.com/?ik_co_id=5d2c39e61ae1bde78c8b4567&ik_pm_no=Pay_${tariff.duration}&ik_x_userid=${this.state.userData.id}&ik_x_duration=${tariff.duration}&ik_am=${tariff.price*26}&ik_cur=UAH&ik_desc=%D0%9F%D0%BE%D0%B4%D0%BF%D0%B8%D1%81%D0%BA%D0%B0+IPTVPLC+%D0%BD%D0%B0+${tariff.duration}+${tariff.duration === 3 ? '%D0%BC%D0%B5%D1%81%D1%8F%D1%86%D0%B0' : '%D0%BC%D0%B5%D1%81%D1%8F%D1%86%D0%B5%D0%B2'}`}
+										>
+											Продлить
+										</a>
+									</div>
+								)}
+							</div>
+						</div>
+					</Modal>
 				)}
 			</Fragment>
 		);
 
 		return (
 			<div className="container content">
-				<Card title={`Личный кабинет пользователя ${this.state.userData.username}`}>
+				<Card title={`Личный кабинет пользователя ${this.state.userData.username}`} id="userCard">
 					{globalAccountData}
 					{subscribeData}
 				</Card>

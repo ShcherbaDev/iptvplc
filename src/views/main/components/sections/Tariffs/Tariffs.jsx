@@ -16,10 +16,9 @@ class Tariffs extends Component {
 					<div className="section-content">
 						<div className="container">
 							<div className="row">
-								<Tariff duration="3" price="1" />
-								<Tariff duration="6" price="2" />
-								<Tariff duration="9" price="3" />
-								<Tariff duration="12" price="4" />
+								{app_tariffs.map((tariff, index) =>
+									<Tariff {...tariff} key={index.toString()} />
+								)}
 							</div>
 						</div>
 					</div>
