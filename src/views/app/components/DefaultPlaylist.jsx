@@ -5,7 +5,6 @@ import PlaylistItem from './PlaylistItem';
 import Loading from '../../../components/Loading/Loading';
 
 import parseM3uToJson from '../../../assets/js/parseM3U';
-import importPlaylistPaths from '../../../assets/js/playlistManager';
 
 class DefaultPlaylist extends Component {
 	constructor(props) {
@@ -28,8 +27,7 @@ class DefaultPlaylist extends Component {
 	}
 
 	componentWillMount() {
-		const playlistPaths = importPlaylistPaths();
-		parseM3uToJson(playlistPaths[0])
+		parseM3uToJson('/static/playlists/iptvchannels.m3u')
 			.then((data) => {
 				this.props.onSetDefaultPlaylist(data);
 			});

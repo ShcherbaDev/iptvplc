@@ -107,7 +107,7 @@ module.exports = {
 			},
 
 			{
-				from: './src/playlists', to: './static/playlists'
+				from: './src/assets/playlists', to: './static/playlists'
 			}
 		]),
 

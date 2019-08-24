@@ -2,13 +2,11 @@ const router = require('express').Router();
 const crypto = require('crypto-js');
 const fetch = require('node-fetch').default;
 
-const importPlaylistPaths = require('../assets/js/playlistManager').default;
-
 router.get('/:hash', (req, res) => {
 	const {
-		APP_PROTOCOL, APP_DOMAIN, APP_PORT, APP_PLAYLIST_INDEX
+		APP_PROTOCOL, APP_DOMAIN, APP_PORT
 	} = process.env;
-	const appDomain = `${APP_PROTOCOL}://${APP_DOMAIN}:${APP_PORT}`;
+	const appDomain = process.env.NODE_ENV === 'dev' ? `${APP_PROTOCOL}://${APP_DOMAIN}:${APP_PORT}` : `${APP_PROTOCOL}://${APP_DOMAIN}`;
 
 	if (req.headers['content-type'] === undefined) {
 		const validHash = req.params.hash.replace('-', '+').replace('_', '/');
@@ -30,9 +28,7 @@ router.get('/:hash', (req, res) => {
 					res.redirect('/static/images/expiredSubscribe.jpg');
 				}
 				else {
-					const playlistPaths = await importPlaylistPaths(true);
-
-					const playlistReq = await fetch(new URL(playlistPaths[APP_PLAYLIST_INDEX], appDomain));
+					const playlistReq = await fetch(new URL('/static/playlists/iptvchannels.m3u', appDomain));
 					const playlistRes = await playlistReq.text();
 
 					const playlistItemRegExp = new RegExp(/#EXTINF:(.*?) tvg-logo=(.*?),(.*?)$\n#EXTGRP:(.*?)$\n(.*)$/gm);

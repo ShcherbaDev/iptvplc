@@ -22,13 +22,6 @@ module.exports.create = () => {
 
 	if (MAIL_HOST === 'smtp.gmail.com') {
 		mailConfig = {
-			// host: MAIL_HOST,
-			// port: parseInt(MAIL_PORT, 10),
-			// secure: false,
-			// tls: {
-			// 	ciphers: 'SSLv3'
-			// },
-			// requireTLS: true,
 			service: 'Gmail',
 			auth: {
 				user: MAIL_USER,
@@ -40,11 +33,8 @@ module.exports.create = () => {
 	transporter = nodemailer.createTransport(mailConfig);
 };
 
-module.exports.sendMail = (options) => {
+module.exports.sendMail = (options, callback) => {
 	transporter.sendMail(options, (err, info) => {
-		if (err) {
-			console.error(err);
-		}
-		console.log(info);
+		callback(err, info);
 	});
 };

@@ -1,0 +1,18 @@
+Pass: pBn5YfH4M9kRjgT
+
+Server user: root
+Server pass: eWq7641oeur2
+
+For running node.js user: node
+For running node.js pass: IXtfeqDzigZ3C8P8
+
+VMmanager user: iptvplc
+VMmanager pass: 8QssGqV29cgD
+
+Mysql user: root
+Mysql pass: 5BfTbE55HzhhzXAm
+
+# Commands
+Turn on/off apache: service httpd start/stop
+Go to root site folder: cd /var/www/html
+Run/stop site server file (in /var/www/html): forever start/stop server.js

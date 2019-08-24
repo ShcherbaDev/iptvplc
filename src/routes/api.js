@@ -95,11 +95,11 @@ router.get('/user/:idOrUsername', (req, res) => {
 });
 
 // Mail
-router.post('/sendMail', async (req) => {
+router.post('/sendMail', async (req, res) => {
 	const {
 		name, email, message, pageFrom
 	} = req.body;
-	const subjectText = pageFrom === '/' ? `${name} (${email}) отправил(-а) сообщение через форму обратной связи на главной странице` : `${name} (${email}) отправил(-а) сообщение`;
+	const subjectText = pageFrom === '/' ? `${name} (${email}) отправил(-а) сообщение через форму обратной связи на главной странице` : `Пользователь ${name} (${email}) отправил(-а) сообщение`;
 
 	function sendMail() {
 		return new Promise((resolve, reject) => {
@@ -123,11 +123,11 @@ router.post('/sendMail', async (req) => {
 		const captchaResponseObject = await validateCaptcha(req.body.captchaResponse);
 
 		if (captchaResponseObject.success) {
-			return sendMail();
+			return sendMail().then(() => res.sendStatus(200)).catch(() => res.sendStatus(500));
 		}
 		return new Promise(reject => reject(captchaResponseObject));
 	}
-	return sendMail();
+	return sendMail().then(() => res.sendStatus(200)).catch(() => res.sendStatus(500));
 });
 
 module.exports = router;

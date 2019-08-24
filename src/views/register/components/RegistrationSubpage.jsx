@@ -10,7 +10,7 @@ class RegistrationSubpage extends Component {
 		this.state = {
 			login: '',
 			isLoginValid: false,
-			loginError: 'Логин должнен быть хотя-бы 4 символа в длину и первым символом должна быть буква.',
+			loginError: 'Логин должен быть написан латиницей, хотя бы 4 символа в длину.',
 
 			email: '',
 			isEmailValid: false,
@@ -148,7 +148,7 @@ class RegistrationSubpage extends Component {
 						<input type="password" className="form-control" id="registrationPasswordField" name="registrationPasswordField" required onChange={this.validatePassword.bind(this)} />
 					
 						<div className="invalid-feedback">
-							Пароль должен быть хотя-бы 6 символов в длину.
+							Пароль должен содержать не менее 6 символов.
 						</div>
 					</div>
 					<div className={`form-group${this.state.password === this.state.repeatedPassword ? '' : ' invalid'}`}>

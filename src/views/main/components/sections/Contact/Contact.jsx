@@ -31,7 +31,13 @@ class Contact extends Component {
 					name, email, message, captchaResponse,
 					pageFrom: '/'
 				})
-			});
+			})
+				.then(() => {
+					alert('Сообщение было успешно отправлено!');
+				})
+				.catch(() => {
+					alert('Во время отправки сообщения произошла ошибка.\nПожалуйста, попробуйте ещё раз.');
+				});
 		}
 		else {
 			alert('Для отправки сообщения, пожалуйста, пройдите капчу.');

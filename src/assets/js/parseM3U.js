@@ -1,9 +1,8 @@
 export default async function parseM3uToJson(path) {
-	const request = await fetch(`${path}`);
+	const request = await fetch(path);
 	const response = await request.text();
 
 	const splittedPlaylistItems = response.match(/#EXTINF:(.*?) tvg-logo="(.*?)",(.*)\n#EXTGRP:(.*)\n(.*)/gm);
-
 	const result = {};
 
 	splittedPlaylistItems.forEach((item, index) => {
