@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-import Section from '../../Section/Section';
+import Section from '../Section';
 
 class About extends Component {
 	render() {

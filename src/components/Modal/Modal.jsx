@@ -14,7 +14,11 @@ class Modal extends Component {
 		return createPortal(
 			(
 				<div className="modal-container">
-					<Card title={this.props.title} onClose={this.props.onClose} footer={this.props.footer}>
+					<Card
+						title={this.props.title}
+						footer={this.props.footer}
+						onClose={this.props.onClose}
+						style={this.props.style}>
 						{this.props.children}
 					</Card>
 				</div>

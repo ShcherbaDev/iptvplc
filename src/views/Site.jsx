@@ -12,10 +12,6 @@ import App from './app/App';
 import Login from './login/Login';
 import Register from './register/Register';
 import User from './user/User';
-import Admin from './admin/Admin';
-
-import SuccessPayment from './payment/SuccessPayment';
-import PaymentError from './payment/PaymentError';
 
 class Site extends Component {
 	constructor(props) {
@@ -41,16 +37,12 @@ class Site extends Component {
 				<Header />
 
 				<Switch>
-					<Route exact path="/" render={() => !this.state.isUserLoggedIn ? <Main /> : <Redirect to="/app" />} />
+					<Route exact path="/" component={Main} />
 
-					<Route path="/app" render={() => this.state.isUserLoggedIn ? <App /> : <Redirect to="/" />} />
+					<Route path="/app" component={App} />
 					<Route path="/login" component={Login} />
 					<Route path={["/register", "/register/success"]} component={Register} />
 					<Route path="/user/:username" component={User} />
-					<Route path="/admin" component={Admin} />
-
-					<Route path="/payment/success" component={SuccessPayment} />
-					<Route path="/payment/error" component={PaymentError} />
 				</Switch>
 
 				<div className="background"></div>

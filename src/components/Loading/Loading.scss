@@ -1,5 +1,33 @@
-.loading {
-	span.spinner {
-		margin-right: 5px;
+.loading-grid {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+
+	.loading-spin {
+		width: 72px;
+		height: 72px;
+		border: 8px solid #fff;
+		border-top-color: #1d9e26;
+		border-right-color: #1d9e26;
+		border-radius: 50%;
+		margin-bottom: 10px;
+
+		animation: loading-spin 1s linear infinite;
+	}
+
+	p {
+		margin-bottom: 0;
+		color: #fff;
+		text-align: center;
+	}
+}
+
+@keyframes loading-spin {
+	0% {
+		transform: rotate(0deg);
+	}
+
+	100% {
+		transform: rotate(360deg);
 	}
 }

@@ -17,6 +17,7 @@
     "@babel/runtime": "^7.4.5",
     "@types/socket.io-client": "^1.4.32",
     "bcryptjs": "^2.4.3",
+    "body-parser": "^1.19.0",
     "cookie-parser": "^1.4.4",
     "cors": "^2.8.5",
     "crypto": "^1.0.1",

@@ -6,5 +6,5 @@ export default async function isUserLoggedIn() {
 		credentials: 'same-origin'
 	});
 
-	return { isLoggedIn: request.isLoggedIn, username: request.username };
+	return { isLoggedIn: request.isLoggedIn, username: request.username, id: request.id };
 }

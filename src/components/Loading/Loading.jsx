@@ -9,9 +9,9 @@ class Loading extends Component {
 
 	render() {
 		return (
-			<div className="loading">
-				<span className="spinner spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-				Загрузка...
+			<div className="loading-grid">
+				<div className="loading-spin"></div>
+				<p>Загрузка...</p>
 			</div>
 		);
 	}

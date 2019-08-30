@@ -7,7 +7,7 @@ import { createStore, combineReducers } from 'redux';
 import { Provider } from 'react-redux';
 
 // Redux reducers
-import playlistCreatorReducer from '../../store/reducers/playlistCreatorReducer';
+import appReducer from '../../store/reducers/appReducer';
 
 // Adding components
 import Site from '../../views/Site';
@@ -17,7 +17,7 @@ import '../styles/bootstrap.min.css';
 import '../styles/styles.scss';
 
 const rootReducer = combineReducers({
-	playlistCreatorReducer
+	appReducer
 });
 
 const store = createStore(rootReducer, node_env === 'dev' ? window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__() : emptyFunc => emptyFunc);

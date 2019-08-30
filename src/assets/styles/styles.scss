@@ -148,13 +148,19 @@ ul.list {
 }
 
 /* Inputs */
-/* Thanks to martinezjc for hack: https://stackoverflow.com/a/29580847 */
 .form-group {
 	label {
 		color: #fff;
 	}
+
+	.input-group > .input-group-append .input-group-text {
+		background-color: #444;
+		color: #fff;
+		border-color: #555;
+	}
 }
 
+/* Thanks to martinezjc for hack: https://stackoverflow.com/a/29580847 */
 input.form-control:-webkit-autofill,
 input.form-control:-webkit-autofill:hover {
 	transition: background-color 5000s ease-in-out 0s;
@@ -162,7 +168,7 @@ input.form-control:-webkit-autofill:hover {
 }
 
 .form-control {
-	background-color: rgba(44, 44, 44, .7);
+	background-color: rgba(44, 44, 44, .9);
 	border-color: rgba(44, 44, 44, .9);
 	border-width: 1px;
 	color: #ccc;
@@ -213,26 +219,22 @@ blockquote.blockquote {
 	}
 }
 
-/* Tables */
-table.table {
-	margin-bottom: 0;
+/* Vertical button group */
+button.list-group-item {
 	color: #fff;
-	border: 1px solid #555;
+	background-color: transparent;
+	border-color: #555;
 
-	thead {
-		background-color: rgb(48, 48, 48);
-
-		th {
-			border-bottom: 1px solid rgb(60, 60, 60);
-			border-top: 0;
-		}
+	i {
+		width: 24px;
 	}
+}
 
-	tbody {
-		background-color: rgb(55, 55, 55);
+button.list-group-item.active {
+	background-color: rgba(255, 255, 255, .05);
+}
 
-		tr:not(:last-child) td {
-			border-bottom: 1px solid rgb(60, 60, 60)
-		}
-	}
+button.list-group-item:hover {
+	background-color: rgba(255, 255, 255, .05);
+	color: #fff;
 }

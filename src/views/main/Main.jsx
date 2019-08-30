@@ -2,12 +2,9 @@ import React, { Component, Fragment } from 'react';
 
 import './assets/css/styles.scss';
 
-import Navbar from './components/Navbar/Navbar';
-
-import Header from './components/sections/Header/Header';
-import About from './components/sections/About/About';
-import Tariffs from './components/sections/Tariffs/Tariffs';
-import Contact from './components/sections/Contact/Contact';
+import Header from './components/sections/Header';
+import About from './components/sections/About';
+import Contact from './components/sections/Contact';
 
 class Main extends Component {
 	componentDidMount() {
@@ -21,11 +18,17 @@ class Main extends Component {
 	render() {
 		return (
 			<Fragment>
-				<Navbar />
+				<ul className="nav justify-content-center">
+					<li className="nav-item">
+						<a href="#about" className="nav-link">О приложении</a>
+					</li>
+					<li className="nav-item">
+						<a href="#contact" className="nav-link">Связаться</a>
+					</li>
+				</ul>
 
 				<Header />
 				<About />
-				<Tariffs />
 				<Contact />
 			</Fragment>
 		);

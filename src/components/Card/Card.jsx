@@ -9,8 +9,11 @@ class Card extends Component {
 
 	render() {
 		return (
-			<div className={`card-container${this.props.className !== undefined ? ` ${this.props.className}` : ''}`} id={this.props.id}>
-				<div className="card" style={this.props.style}>
+			<div
+				className={`card-container${this.props.className !== undefined ? ` ${this.props.className}` : ''}`}
+				id={this.props.id}
+				style={this.props.style}>
+				<div className="card">
 					{this.props.title !== undefined && (
 						<div className="card-header">
 							{this.props.title}

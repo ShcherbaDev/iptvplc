@@ -16,7 +16,6 @@
 
 	<script>
 		const node_env = '<%= process.env.NODE_ENV %>';
-		const app_tariffs = JSON.parse('<%= process.env.APP_TARIFFS %>');
 		
 		const captcha_key = '<%= process.env.CAPTCHA_SITE_KEY %>';
 		const captcha_theme = '<%= process.env.CAPTCHA_THEME %>';
@@ -29,6 +28,10 @@
 					captchaDomElementId = 'submitFormCaptcha';
 					break;
 
+				case '/app':
+					captchaDomElementId = 'feedbackCaptcha';
+					break;
+
 				case '/register':
 					captchaDomElementId = 'captcha';
 					break;
@@ -38,7 +41,7 @@
 					break;
 			}
 
-			if (window.location.pathname === '/' || window.location.pathname === '/register') {
+			if (window.location.pathname === '/' || window.location.pathname === '/app' || window.location.pathname === '/register') {
 				grecaptcha.render(captchaDomElementId, {
 					'sitekey': captcha_key,
 					'theme': captcha_theme

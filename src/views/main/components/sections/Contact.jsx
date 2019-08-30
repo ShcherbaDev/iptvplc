@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-import Section from '../../Section/Section';
+import Section from '../Section';
 
 class Contact extends Component {
 	constructor() {
@@ -81,6 +81,7 @@ class Contact extends Component {
 						</div>
 					</div>
 				</div>
+				<div className="section-background"></div>
 			</Section>
 		);
 	}

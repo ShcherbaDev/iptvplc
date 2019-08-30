@@ -7,15 +7,30 @@ const mailManager = require('../modules/nodemailer');
 const validateCaptcha = require('../modules/validateCaptcha');
 
 router.get('/', (req, res) => {
-	res.render('index');
+	if (req.user === undefined) {
+		res.render('index');
+	}
+	else {
+		res.redirect('/app');
+	}
 });
 
 router.get('/app', (req, res) => {
-	res.render('index');
+	if (req.user !== undefined) {
+		res.render('index');
+	}
+	else {
+		res.redirect('/');
+	}
 });
 
 router.get('/login', (req, res) => {
-	res.render('index');
+	if (req.user === undefined) {
+		res.render('index');
+	}
+	else {
+		res.redirect('/app');
+	}
 });
 
 router.get('/register', (req, res) => {
@@ -63,7 +78,6 @@ router.post('/register', async (req, res) => {
 		registrationEmailField,
 		registrationPasswordField,
 		registrationConfirmPasswordField,
-		referralUsername,
 		captchaResponse
 	} = req.body;
 
@@ -96,35 +110,15 @@ router.post('/register', async (req, res) => {
 						const userActivationHash = crypto.randomBytes(20).toString('hex');
 
 						const CURRENT_TIMESTAMP = { toSqlString: () => 'CURRENT_TIMESTAMP()' };
-						const DEMO_TIME = { toSqlString: () => 'DATE_ADD(CURRENT_TIMESTAMP(), INTERVAL 3 DAY)' };
-						const USER_IP = { toSqlString: () => `INET_ATON('${req.connection.remoteAddress}')` };
 
-						const queryArgs = [registrationLoginField, userPassword, registrationEmailField, USER_IP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, DEMO_TIME, userActivationHash];
+						const queryArgs = [registrationLoginField, userPassword, registrationEmailField, CURRENT_TIMESTAMP, userActivationHash];
 
-						let referralId;
-						if (referralUsername !== undefined) {
-							db.query('SELECT `id` FROM `users` WHERE `username` = ?', referralUsername, (referralError, referralData) => {
-								if (referralError) {
-									throw new Error(referralError);
-								}
-								referralId = referralData[0].id;
+						registerUser(
+							'INSERT INTO `users` (username, password, email, registration_date, activation_hash) VALUES (?, ?, ?, ?, ?)',
+							queryArgs
+						).then(() => sendEmail(registrationEmailField, userActivationHash));
 
-								queryArgs.push(referralId);
-
-								registerUser(
-									'INSERT INTO `users` (username, password, email, ip, registration_date, subscription_date, unsubscription_date, activation_hash, referralId) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-									queryArgs
-								).then(() => sendEmail(registrationEmailField, userActivationHash));
-							});
-						}
-						else {
-							registerUser(
-								'INSERT INTO `users` (username, password, email, ip, registration_date, subscription_date, unsubscription_date, activation_hash) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-								queryArgs
-							).then(() => sendEmail(registrationEmailField, userActivationHash));
-						}
-
-						res.redirect(307, '/register/success');
+						res.redirect(201, '/register/success');
 					});
 				});
 			}
@@ -160,33 +154,7 @@ router.get('/activate/:hash', (req, res) => {
 					throw new Error(error);
 				}
 
-				// Если пользователь зарегистрировался через реферальную ссылку - добавить реферу 1 день подписки
-				if (val[0].referralId !== null) {
-					db.query(`SELECT id, active FROM users WHERE referralId = ${val[0].referralId}`, (referralErr, users) => {
-						if (referralErr) {
-							throw new Error(referralErr);
-						}
-
-						let activeUsersCount = 0;
-						users.forEach((user) => {
-							if (user.active === 1) {
-								activeUsersCount += 1;
-							}
-						});
-
-						if (activeUsersCount > 0 && activeUsersCount % 5 === 0) {
-							db.query(`UPDATE \`users\` SET \`unsubscription_date\` = DATE_ADD(unsubscription_date, INTERVAL 1 MONTH) WHERE \`id\` = ${val[0].referralId}`, (updateErr) => {
-								if (updateErr) {
-									throw new Error(updateErr);
-								}
-								loginUser(val[0]);
-							});
-						}
-					});
-				}
-				else {
-					loginUser(val[0]);
-				}
+				loginUser(val[0]);
 			});
 		}
 	});
@@ -198,50 +166,6 @@ router.get('/user/:username', (req, res) => {
 	}
 	else {
 		res.redirect('/');
-	}
-});
-
-router.get('/admin', (req, res) => {
-	if (process.env.NODE_ENV === 'dev'
-		|| (
-			process.env.NODE_ENV !== 'dev'
-			&& req.user !== undefined
-			&& req.user[0].isAdmin === 1
-		)) {
-		res.render('index');
-	}
-	else {
-		res.sendStatus(403);
-	}
-
-	// if (process.env.NODE_ENV === 'dev') {
-	// 	res.render('index');
-	// }
-	// else {
-	// 	if (req.user !== undefined && req.user[0].isAdmin === 1) {
-	// 		res.render('index');
-	// 	}
-	// 	else {
-	// 		res.sendStatus(403);
-	// 	}
-	// }
-});
-
-router.get('/referral/:username', (req, res) => {
-	if (req.user !== undefined) {
-		res.redirect('/app');
-	}
-	else {
-		db.query(`SELECT username FROM users WHERE username = '${req.params.username}'`, (err, val) => {
-			if (err) {
-				throw new Error(err);
-			}
-
-			if (val[0] !== undefined) {
-				res.cookie('referral', val[0].username);
-			}
-			res.redirect('/');
-		});
 	}
 });
 

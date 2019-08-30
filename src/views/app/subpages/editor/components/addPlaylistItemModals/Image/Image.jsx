@@ -1,0 +1,42 @@
+import React, { Component, Fragment } from 'react';
+import { connect } from 'react-redux';
+
+import ImagePreview from './ImagePreview';
+
+class Image extends Component {
+	constructor(props) {
+		super(props);
+	}
+
+	render() {
+		return (
+			<Fragment>
+				<div className="form-group">
+					<label htmlFor="youtubeVideoUrl">URL видео:</label>
+					<input type="url" id="youtubeVideoUrl"
+						className="form-control"
+						required
+						placeholder="https://youtube.com/..."
+						onChange={e => this.props.onSetPreviewData(e.target.value)} />
+				</div>
+				<ImagePreview />
+			</Fragment>
+		);
+	}
+}
+
+export default connect(
+	state => ({ store: state }), // Dispatch function is not working without that
+	dispatch => ({
+		onSetPreviewData(imageUrl) {
+			dispatch({
+				type: 'SET_PREVIEW_DATA',
+				payload: {
+					name: imageUrl.split('/').pop().split('?')[0],
+					icon: imageUrl,
+					url: imageUrl
+				}
+			});
+		}
+	})
+)(Image);

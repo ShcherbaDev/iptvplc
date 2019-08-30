@@ -35,6 +35,8 @@ img.app-logo {
 }
 
 section {
+	position: relative;
+
 	h1.section-title, p, blockquote {
 		color: #fff;
 	}
@@ -156,7 +158,7 @@ section.main {
 	}
 }
 
-section:not(.main):not(.tariffs) {
+section:not(.main) {
 	background-color: #202020;
 }
 
@@ -165,23 +167,10 @@ section:not(.main) {
 	align-items: center;
 	min-height: 100vh;
 	padding: 25px 0;
+	position: relative;
 
 	.section-content {
 		margin-top: 20px;
-		color: #fff;
-	}
-}
-
-section.tariffs {
-	position: relative;
-	overflow: hidden;
-
-	.container {
-		z-index: 1;
-	}
-
-	h2.subscription-price,
-	h3.subscription-duration {
 		color: #fff;
 	}
 
@@ -206,6 +195,8 @@ section.tariffs {
 }
 
 section.contact {
+	background-color: transparent;
+
 	.section-content {
 		margin-top: 0;
 	}
