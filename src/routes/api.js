@@ -80,8 +80,7 @@ router.get('/user/:idOrUsername', (req, res) => {
 	let isNum = parseInt(idOrUsername, 10);
 	isNum = !isNaN(idOrUsername);
 
-	const query = 
-		isNum
+	const query = isNum
 		? `SELECT * FROM users WHERE id='${idOrUsername}'`
 		: `SELECT * FROM users WHERE username='${idOrUsername}'`;
 
@@ -99,7 +98,7 @@ router.get('/user/:idOrUsername', (req, res) => {
 
 router.get('/user/:id/playlists', (req, res) => {
 	const { id } = req.params;
-	
+
 	const query = `SELECT * FROM playlists WHERE author_id='${id}'`;
 
 	db.query(query, (err, playlists) => {
@@ -148,7 +147,7 @@ router.post('/createPlaylist', (req, res) => {
 		});
 	}
 	else {
-		res.sendStatus(400)
+		res.sendStatus(400);
 	}
 });
 
@@ -156,8 +155,8 @@ router.post('/deletePlaylist', (req, res) => {
 	const { id } = req.body;
 
 	const query = 'DELETE FROM `playlists` WHERE id = ?';
-	
-	db.query(query, id, err => {
+
+	db.query(query, id, (err) => {
 		if (err) {
 			console.log(`${err}\n---\nInput data:\nPlaylist id: ${id}`);
 			res.sendStatus(500);
@@ -168,12 +167,12 @@ router.post('/deletePlaylist', (req, res) => {
 
 router.post('/savePlaylist', (req, res) => {
 	const { playlist_id, new_data } = req.body;
-	const CURRENT_TIMESTAMP = { toSqlString: () => 'CURRENT_TIMESTAMP()' }
+	const CURRENT_TIMESTAMP = { toSqlString: () => 'CURRENT_TIMESTAMP()' };
 
 	const query = 'UPDATE `playlists` SET data = ?, last_edit_date = ? WHERE id = ?';
 	const queryArgs = [new_data, CURRENT_TIMESTAMP, playlist_id];
 
-	db.query(query, queryArgs, err => {
+	db.query(query, queryArgs, (err) => {
 		if (err) {
 			console.log(`${err}\n---\nInput data:\nPlaylist id: ${playlist_id}\nIs new playlist data empty: ${new_data.length < 1}`);
 			res.sendStatus(500);
@@ -187,7 +186,8 @@ router.post('/sendMail', async (req, res) => {
 	const {
 		name, email, message, pageFrom
 	} = req.body;
-	const subjectText = pageFrom === '/' 
+
+	const subjectText = pageFrom === '/'
 		? `${name} (${email}) отправил(-а) сообщение через форму обратной связи на главной странице`
 		: `Пользователь ${name} (${email}) отправил(-а) сообщение`;
 

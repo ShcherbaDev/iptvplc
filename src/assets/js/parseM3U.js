@@ -2,6 +2,7 @@
  * Парсер создан на основе кода от sajjadjaved01:
  * https://github.com/sajjadjaved01/iptv/blob/master/app/src/main/java/com/muparse/M3UParser.java
  */
+
 export default function parseM3U(string) {
 	const decodedPlaylistString = decodeURIComponent(
 		escape(
@@ -20,9 +21,9 @@ export default function parseM3U(string) {
 	const EXT_URL = /(http|https):\/\//;
 	const lines = decodedPlaylistString.split(EXT_INF);
 
-	let result = [];
+	const result = [];
 
-	for (let i = 0; i < lines.length; i++) {
+	for (let i = 0; i < lines.length; i += 1) {
 		const currentLine = lines[i];
 		if (!currentLine.includes(EXT_M3U)) {
 			const dataArray = currentLine.split(',');
@@ -40,26 +41,28 @@ export default function parseM3U(string) {
 					icon = dataArray[0].substring(dataArray[0].indexOf(EXT_LOGO) + EXT_LOGO.length).replace('=', '').replace('\n', '').replace(/\"/g, '');
 				}
 				else {
-					duration = dataArray[0].replace(":", "").replace("\n", "");
+					duration = dataArray[0].replace(':', '').replace('\n', '');
 				}
 
 				// Get group
 				if (dataArray[1].includes(EXT_GRP)) {
-					name = dataArray[1].substring(0, dataArray[1].search(EXT_GRP)-1).replace('\n', '');
+					name = dataArray[1].substring(0, dataArray[1].search(EXT_GRP) - 1).replace('\n', '');
 					url = dataArray[1].substring(dataArray[1].search(EXT_URL)).replace('\n', '').replace('\r', '').replace(' ', '');
-					group = dataArray[1].substring(dataArray[1].indexOf(EXT_GRP) + EXT_GRP.length).replace('\n', '').replace(url, '').replace(/\s$/, '')
+					group = dataArray[1].substring(dataArray[1].indexOf(EXT_GRP) + EXT_GRP.length).replace('\n', '').replace(url, '').replace(/\s$/, '');
 				}
-
 				else {
 					url = dataArray[1].substring(dataArray[1].search(EXT_URL)).replace('\n', '').replace('\r', '').replace(' ', '');
-					name = dataArray[1].substring(0, dataArray[1].search(EXT_URL)-1).replace('\n', '');
+					name = dataArray[1].substring(0, dataArray[1].search(EXT_URL) - 1).replace('\n', '');
 				}
 
 				result.push({
 					id: result.length,
 					active: false,
-					duration, icon,
-					name, group, url
+					duration,
+					icon,
+					name,
+					group,
+					url
 				});
 			}
 		}

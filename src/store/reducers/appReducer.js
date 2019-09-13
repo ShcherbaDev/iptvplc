@@ -1,4 +1,4 @@
-import { removeItem } from "../helpers/arrays";
+import { removeItem } from '../helpers/arrays';
 
 const initialState = {
 	currentSubpage: 'hub',
@@ -21,7 +21,9 @@ export default function appReducer(state = initialState, action) {
 			};
 
 		case 'SET_PLAYLIST':
-			action.payload.data.forEach(item => {
+			action.payload.data.forEach((playlistItem) => {
+				const item = playlistItem;
+
 				// For youtube video
 				if (
 					/^(https?\:\/\/)?((www\.)?youtube\.com|youtu\.?be)\/.+$/.test(item.url)
@@ -54,7 +56,7 @@ export default function appReducer(state = initialState, action) {
 				...state,
 				playlist: {
 					...state.playlist,
-					data: state.playlist.data.map(item => {
+					data: state.playlist.data.map((item) => {
 						if (item.id === action.payload) {
 							return {
 								...item,
@@ -162,13 +164,13 @@ export default function appReducer(state = initialState, action) {
 			};
 
 		case 'DELETE_PLAYLIST_ITEM': {
-			const resultPlaylist = removeItem(state.playlist.data, state.playlist.data.findIndex(item => item.id === action.payload))
+			const resultPlaylist = removeItem(state.playlist.data, state.playlist.data.findIndex(item => item.id === action.payload));
 
 			return {
 				...state,
 				playlist: {
 					...state.playlist,
-					isEmpty: resultPlaylist.length < 1 ? true : false,
+					isEmpty: resultPlaylist.length < 1,
 					data: resultPlaylist
 				}
 			};
