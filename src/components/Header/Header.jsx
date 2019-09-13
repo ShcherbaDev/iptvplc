@@ -128,10 +128,7 @@ class Header extends Component {
 						</ul>
 
 						<div className="mt-2 mt-lg-0">
-							<Dropdown style={{ padding: 10 }} id="user-controls" title={this.state.username === null ? <span>Войти / Зарегистрироватся</span> : this.state.username}>
-								<a href={`/user/${this.state.username}`} className="dropdown-item">Личный кабинет</a>
-								<a href="#" className="logout btn btn-danger btn-block" onClick={(event) => this.logout(event)}>Выйти</a>
-							</Dropdown>
+							Вы вошли как {this.state.username} | <button className="btn btn-link p-0" onClick={event => this.logout(event)}>Выйти</button>
 						</div>
 					</div>
 

@@ -160,13 +160,4 @@ router.get('/activate/:hash', (req, res) => {
 	});
 });
 
-router.get('/user/:username', (req, res) => {
-	if (req.user !== undefined && req.user[0].username === req.params.username) {
-		res.render('index');
-	}
-	else {
-		res.redirect('/');
-	}
-});
-
 module.exports = router;

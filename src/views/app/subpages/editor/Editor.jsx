@@ -269,7 +269,7 @@ class Editor extends Component {
 							textOverflow: "ellipsis"
 						}}
 						onClick={e => this.togglePlaylistItemActive(item.id, e.ctrlKey)}>
-						<img src={item.icon}
+						<img src={item.icon || '/static/images/nopic.jpg'}
 							alt={`Иконка ${item.name}`}
 							onError={(e) => e.target.src = '/static/images/nopic.jpg'}
 							style={{

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 
 import isUserLoggedIn from '../assets/js/isUserLoggedIn';
 
@@ -11,7 +11,6 @@ import Main from './main/Main';
 import App from './app/App';
 import Login from './login/Login';
 import Register from './register/Register';
-import User from './user/User';
 
 class Site extends Component {
 	constructor(props) {
@@ -42,7 +41,6 @@ class Site extends Component {
 					<Route path="/app" component={App} />
 					<Route path="/login" component={Login} />
 					<Route path={["/register", "/register/success"]} component={Register} />
-					<Route path="/user/:username" component={User} />
 				</Switch>
 
 				<div className="background"></div>
