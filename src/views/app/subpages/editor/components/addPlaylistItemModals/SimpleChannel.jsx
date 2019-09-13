@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import { connect } from 'react-redux';
 
 class SimpleChannel extends Component {
@@ -7,31 +7,28 @@ class SimpleChannel extends Component {
 	}
 
 	render() {
-		if (this.props.previewData.name !== '') {
-			return (
-				<Fragment>
-					<div className="form-group">
-						<label htmlFor="channelName">Название:</label>
-						<input type="text" id="channelName" className="form-control"
-							required 
-							onChange={e => this.props.onSetPreviewData('name', e.target.value)} />
-					</div>
-					<div className="form-group">
-						<label htmlFor="channelIcon">URL иконки:</label>
-						<input type="url" id="channelIcon" className="form-control"
-							required 
-							onChange={e => this.props.onSetPreviewData('icon', e.target.value)} />
-					</div>
-					<div className="form-group">
-						<label htmlFor="channelUrl">URL:</label>
-						<input type="url" id="channelUrl" className="form-control"
-							required 
-							onChange={e => this.props.onSetPreviewData('url', e.target.value)} />
-					</div>
-				</Fragment>
-			);
-		}
-		return null;
+		return (
+			<Fragment>
+				<div className="form-group">
+					<label htmlFor="channelName">Название:</label>
+					<input type="text" id="channelName" className="form-control"
+						required 
+						onChange={e => this.props.onSetPreviewData('name', e.target.value)} />
+				</div>
+				<div className="form-group">
+					<label htmlFor="channelIcon">URL иконки:</label>
+					<input type="url" id="channelIcon" className="form-control"
+						required 
+						onChange={e => this.props.onSetPreviewData('icon', e.target.value)} />
+				</div>
+				<div className="form-group">
+					<label htmlFor="channelUrl">URL:</label>
+					<input type="url" id="channelUrl" className="form-control"
+						required 
+						onChange={e => this.props.onSetPreviewData('url', e.target.value)} />
+				</div>
+			</Fragment>
+		);
 	}
 }
 
@@ -42,7 +39,7 @@ export default connect(
 			dispatch({
 				type: 'SET_PREVIEW_DATA',
 				payload: {
-					...this.previewData,
+					...this.previewData, // Getting previewData from redux state
 					[key]: value
 				}
 			})

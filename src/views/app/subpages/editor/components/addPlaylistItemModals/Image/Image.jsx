@@ -12,11 +12,10 @@ class Image extends Component {
 		return (
 			<Fragment>
 				<div className="form-group">
-					<label htmlFor="youtubeVideoUrl">URL видео:</label>
-					<input type="url" id="youtubeVideoUrl"
+					<label htmlFor="imageUrl">URL картинки:</label>
+					<input type="url" id="imageUrl"
 						className="form-control"
 						required
-						placeholder="https://youtube.com/..."
 						onChange={e => this.props.onSetPreviewData(e.target.value)} />
 				</div>
 				<ImagePreview />

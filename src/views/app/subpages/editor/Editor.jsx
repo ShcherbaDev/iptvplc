@@ -10,6 +10,8 @@ import Card from '../../../../components/Card/Card';
 import Loading from '../../../../components/Loading/Loading';
 
 import isObjectEmpty from '../../../../assets/js/isObjectEmpty';
+
+import SimpleChannel from './components/addPlaylistItemModals/SimpleChannel'; 
 import YoutubeVideoModal from './components/addPlaylistItemModals/YoutubeVideo/YoutubeVideo';
 import ImageModal from './components/addPlaylistItemModals/Image/Image';
 
