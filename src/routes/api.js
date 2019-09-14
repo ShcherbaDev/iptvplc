@@ -134,9 +134,13 @@ router.get('/playlist/:id', (req, res) => {
 router.post('/createPlaylist', (req, res) => {
 	const { user_id, filename, filedata } = req.body;
 
-	if (filedata.startsWith('data:audio/x-mpegurl;')) {
-		const query = 'INSERT INTO `playlists` (filename, data, author_id) VALUES (?, ?, ?)';
-		const queryArgs = [filename, filedata, user_id];
+	const mimeTypes = process.env.PLAYLIST_ACCEPTABLE_MIME_TYPES.split(', ');
+	const regExp = new RegExp(`^data:(${mimeTypes.join('|')});`);
+	const fileMimeType = filedata.match(regExp)[1];
+
+	if (regExp.test(filedata) && fileMimeType !== null) {
+		const query = 'INSERT INTO `playlists` (filename, mime_type, data, author_id) VALUES (?, ?, ?, ?)';
+		const queryArgs = [filename, fileMimeType, filedata, user_id];
 
 		db.query(query, queryArgs, (err, queryResult) => {
 			if (err) {

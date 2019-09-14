@@ -16,6 +16,7 @@
 
 	<script>
 		const node_env = '<%= process.env.NODE_ENV %>';
+		const playlist_acceptable_mime_types = '<%= process.env.PLAYLIST_ACCEPTABLE_MIME_TYPES %>'.split(', ');
 		
 		const captcha_key = '<%= process.env.CAPTCHA_SITE_KEY %>';
 		const captcha_theme = '<%= process.env.CAPTCHA_THEME %>';

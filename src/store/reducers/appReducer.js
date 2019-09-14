@@ -63,7 +63,10 @@ export default function appReducer(state = initialState, action) {
 								active: !item.active
 							};
 						}
-						return item;
+						return {
+							...item,
+							active: false
+						};
 					})
 				}
 			};

@@ -56,18 +56,18 @@ class Editor extends Component {
 	}
 
 	togglePlaylistItemActive(playlistItemId, isCtrlKeyPressed) {
+		const activePlaylistItemIndex = this.props.appStore.playlist.data.findIndex(it => it.active);
+
 		if (!isCtrlKeyPressed) {
-			if (this.props.appStore.playlist.data.findIndex(it => it.active) !== -1
-				&& playlistItemId != this.props.appStore.playlist.data[
-					this.props.appStore.playlist.data.findIndex(it => it.active)
-				].id) {
-				this.props.onTogglePlaylistItemActive(
-					this.props.appStore.playlist.data[
-						this.props.appStore.playlist.data.findIndex(it => it.active)
-					].id
-				);
-			}
-			this.props.onTogglePlaylistItemActive(playlistItemId);
+			// If one of the playlist items is selected
+			// if (activePlaylistItemIndex !== -1 && playlistItemId !== this.props.appStore.playlist.data[activePlaylistItemIndex].id) {
+			// 	this.props.onTogglePlaylistItemActive(
+			// 		this.props.appStore.playlist.data[activePlaylistItemIndex].id
+			// 	);
+			// }
+			// else {
+				this.props.onTogglePlaylistItemActive(playlistItemId);
+			// }
 		}
 	}
 
@@ -288,7 +288,14 @@ class Editor extends Component {
 					{playlistItems}
 				</div>
 			) : (
-				<p>Ваш плейлист пуст!<br/>Исправьте это!</p>
+				<p style={{
+					display: "flex",
+					justifyContent: "center",
+					alignItems: "center",
+					height: "100%",
+					marginBottom: 0,
+					textAlign: "center"
+				}}>Ваш плейлист пуст!<br/>Исправьте это!</p>
 			);
 
 			const activePlaylistItems = this.props.appStore.playlist.data.findIndex(it => it.active);
@@ -298,31 +305,23 @@ class Editor extends Component {
 					<div className="form-group">
 						<label htmlFor="channelName">Название канала:</label>
 						<input type="text" className="form-control" id="channelName" 
-							defaultValue={this.props.appStore.playlist.data[activePlaylistItems].name}
+							value={this.props.appStore.playlist.data[activePlaylistItems].name}
 							onChange={e => this.props.onChangePlaylistItem(activePlaylistItems, 'name', e.target.value)} />
 					</div>
 					<div className="form-group">
 						<label htmlFor="channelIcon">URL иконки:</label>
 						<input type="url" className="form-control" id="channelIcon" 
-							defaultValue={this.props.appStore.playlist.data[activePlaylistItems].icon}
+							value={this.props.appStore.playlist.data[activePlaylistItems].icon}
 							onChange={e => {
-								const iconUrlRegex = /(https?:\/\/.*\.(?:png|jpg|gif|svg))/i;
-								
-								if (iconUrlRegex.test(e.target.value)) {
-									this.props.onChangePlaylistItem(activePlaylistItems, 'icon', e.target.value);
-								}
+								this.props.onChangePlaylistItem(activePlaylistItems, 'icon', e.target.value);
 							}} />
 					</div>
 					<div className="form-group">
 						<label htmlFor="channelUrl">URL:</label>
 						<input type="url" className="form-control" id="channelUrl"
-							defaultValue={this.props.appStore.playlist.data[activePlaylistItems].url}
+							value={this.props.appStore.playlist.data[activePlaylistItems].url}
 							onChange={e => {
-								const channelUrlRegex = /^https?:\/\/([\w\d\-]+\.)+\w{2,}(\/.+)?$/;
-
-								if (channelUrlRegex.test(e.target.value)) {
-									this.props.onChangePlaylistItem(activePlaylistItems, 'url', e.target.value);
-								}
+								this.props.onChangePlaylistItem(activePlaylistItems, 'url', e.target.value);
 							}} />
 					</div>
 				</Fragment>
@@ -333,7 +332,7 @@ class Editor extends Component {
 					<label htmlFor="youtubeVideoUrl">URL видео:</label>
 					<input type="url" id="youtubeVideoUrl" className="form-control"
 						placeholder="https://youtube.com/..."
-						defaultValue={this.props.appStore.playlist.data[activePlaylistItems].url}
+						value={this.props.appStore.playlist.data[activePlaylistItems].url}
 						onChange={e => this.props.onChangeYoutubePlaylistItem(activePlaylistItems, e.target.value)} />
 				</div>
 			);
@@ -342,7 +341,7 @@ class Editor extends Component {
 				<div className="form-group">
 					<label htmlFor="imageUrl">URL картинки:</label>
 					<input type="url" id="imageUrl" className="form-control"
-						defaultValue={this.props.appStore.playlist.data[activePlaylistItems].url}
+						value={this.props.appStore.playlist.data[activePlaylistItems].url}
 						onChange={e => this.props.onChangeImagePlaylistItem(activePlaylistItems, e.target.value)} />
 				</div>
 			);
@@ -422,7 +421,8 @@ class Editor extends Component {
 										justifyContent: "center",
 										alignItems: "center",
 										height: "100%",
-										marginBottom: 0
+										marginBottom: 0,
+										textAlign: "center"
 									}}>Ничего не выбрано для редактирования!</p>}
 								</div>
 							</div>

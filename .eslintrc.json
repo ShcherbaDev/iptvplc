@@ -9,7 +9,7 @@
         "Atomics": "readonly",
         "SharedArrayBuffer": "readonly",
         "node_env": "readonly",
-        "app_tariffs": "readonly"
+        "playlist_acceptable_mime_types": "readonly"
     },
     "parserOptions": {
         "ecmaFeatures": {

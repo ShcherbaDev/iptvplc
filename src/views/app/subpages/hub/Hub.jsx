@@ -3,7 +3,6 @@ import { connect } from 'react-redux';
 
 import Modal from '../../../../components/Modal/Modal';
 import Card from '../../../../components/Card/Card';
-import HubColumn from './components/HubColumn';
 import Loading from '../../../../components/Loading/Loading';
 
 import isUserLoggedIn from '../../../../assets/js/isUserLoggedIn';
@@ -11,6 +10,7 @@ import fetchApi from '../../../../assets/js/fetchApi';
 import parseM3U from '../../../../assets/js/parseM3U';
 import ToolsColumn from './components/columns/ToolsColumn';
 import RecentPlaylistsColumn from './components/columns/RecentPlaylistsColumn';
+import isPlaylistMimeTypeValid from '../../../../assets/js/isPlaylistMimeTypeValid';
 
 class Hub extends Component {
 	constructor(props) {
@@ -19,7 +19,6 @@ class Hub extends Component {
 		this.state = {
 			recentPlaylists: [],
 			isRecentPlaylistsLoading: true,
-			acceptedPlaylistExtension: 'audio/x-mpegurl',
 
 			isModalOpen: false,
 			modalContent: '',
@@ -186,8 +185,8 @@ class Hub extends Component {
 
 	onOpenPlaylist(event) {
 		const { name, type } = event.target.files[0];
-
-		if (type === this.state.acceptedPlaylistExtension) {
+		
+		if (isPlaylistMimeTypeValid(type)) {
 			let reader = new FileReader();
 
 			reader.addEventListener('load', file => {
@@ -210,7 +209,7 @@ class Hub extends Component {
 					title: 'Ошибка!'
 				}
 			});
-			console.error(`MIME type of playlist file should be ${this.state.acceptedPlaylistExtension}`);
+			console.error(`Unknown MIME type of file!`);
 		}
 	}
 
@@ -341,7 +340,7 @@ class Hub extends Component {
 				
 				<input
 					type="file"
-					accept={this.state.acceptedPlaylistExtension}
+					accept={playlist_acceptable_mime_types}
 					style={{ display: 'none' }}
 					id="playlistFileDialog"
 					onChange={this.onOpenPlaylist} />
