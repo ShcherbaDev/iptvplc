@@ -63,18 +63,22 @@ class App extends Component {
 			}
 			else {
 				return (
-					<Card title="Внимание!" style={{ width: '66%', margin: '0 auto' }}>
-						Для получения доступа к приложению подтвердите свой аккаунт через электронную почту.
-					</Card>
+					<div className="content container">
+						<Card title="Внимание!" style={{ width: '66%', margin: '0 auto' }}>
+							Для получения доступа к приложению подтвердите свой аккаунт через электронную почту.
+						</Card>
+					</div>
 				);
 			}
 		}
 		else {
 			return (
-				<Card title="Внимание!" style={{ width: '48%', margin: '0 auto' }}>
-		 			Приложение доступно только для зарегистрированных пользователей!<br />
-		 			Пожалуйста, <Link to="/login">войдите</Link> или <Link to="/register">зарегистрируйтесь</Link> что-бы продолжить.
-				</Card>
+				<div className="content container">
+					<Card title="Внимание!" style={{ width: '48%', margin: '0 auto' }}>
+						Приложение доступно только для зарегистрированных пользователей!<br />
+						Пожалуйста, <Link to="/login">войдите</Link> или <Link to="/register">зарегистрируйтесь</Link> что-бы продолжить.
+					</Card>
+				</div>
 			);
 		}
 	}
