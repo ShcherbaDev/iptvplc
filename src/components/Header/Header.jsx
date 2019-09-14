@@ -113,7 +113,10 @@ class Header extends Component {
 	render() {
 		return (
 			(this.shouldShowHeader() && (
-				<nav className="navbar fixed-top navbar-expand-lg navbar-light bg-light">
+				<nav className="navbar fixed-top navbar-expand-lg navbar-dark bg-dark">
+					<a href="/" className="navbar-brand p-0">
+						<img src="/static/images/logo_navbar.png" alt="Логотип IPTVPLC" />
+					</a>
 					<button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle">
 						<span className="navbar-toggler-icon"></span>
 					</button>
@@ -127,7 +130,7 @@ class Header extends Component {
 							</li>
 						</ul>
 
-						<div className="mt-2 mt-lg-0">
+						<div className="mt-2 mt-lg-0 text-white-50">
 							Вы вошли как {this.state.username} | <button className="btn btn-link p-0" onClick={event => this.logout(event)}>Выйти</button>
 						</div>
 					</div>

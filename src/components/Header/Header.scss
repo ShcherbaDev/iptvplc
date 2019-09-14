@@ -1,3 +1,11 @@
-.logout {
-	margin-top: 1rem;
+.navbar-brand {
+	transition: .08s ease-in-out filter;
+
+	img {
+		width: 42px;
+	}
+
+	&:hover {
+		filter: brightness(1.6);
+	}
 }
