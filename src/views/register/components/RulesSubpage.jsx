@@ -47,17 +47,17 @@ class RulesSubpage extends Component {
 							<ul>
 								<li>Первая кнопка (<i className="fas fa-plus"></i>) позволяет добавить обычный IPTV канал. После нажатия необходимо ввести название канала, ссылку на иконку и адрес канала.</li>
 								<li>
-									Вторая кнопка (<i className="fab fa-youtube"></i>) позволяет добавить в плейлист видео с сервиса "<a href="https://youtube.com" target="_blank">Youtube</a>". В открывшемся диалоговом окне нужно ввести URL адрес необходимого видео.<br/>
-									Однако, не все видеоматериалы с видеохостинга могут воспроизвестить в плеере (например "<a href="https://www.videolan.org/vlc" target="_blank">VLC</a>"). Для возможного решения данной проблемы в плеере "VLC" перейдите <a href="https://www.latecnosfera.com/2016/10/vlc-unable-to-open-mrl.html" target="_blank">сюда</a>.
+									Вторая кнопка (<i className="fab fa-youtube"></i>) позволяет добавить в плейлист видео с сервиса "<a href="https://youtube.com" target="_blank">Youtube</a>" (https://www.youtube.com/). В открывшемся диалоговом окне нужно ввести URL адрес необходимого видео.<br/>
+									Однако, не все видеоматериалы с видеохостинга могут воспроизвестить в плеере (например "<a href="https://www.videolan.org/vlc" target="_blank">VLC</a>" (https://www.videolan.org/vlc)). Для возможного решения данной проблемы в плеере "VLC" перейдите <a href="https://www.latecnosfera.com/2016/10/vlc-unable-to-open-mrl.html" target="_blank">сюда</a> (https://www.latecnosfera.com/2016/10/vlc-unable-to-open-mrl.html).
 								</li>
 								<li>Третья кнопка (<i className="fas fa-image"></i>) добавляет в плейлист картинку из Интернета. В открывшемся диалоговом окне нужно ввести URL адрес необходимой картинки.</li>
 								<li>Кнопка расположенная после первых трех (<i className="fas fa-download"></i>) отвечает за скачивание отредактированого плейлиста и за сохранение его в системе. При успешном сохранении плейлиста в системе, Вам можно будет скачать его к себе на устройство</li>
-								<li>Самая последняя кнопка расположенная на правом боке первой колонки (<i className="fas fa-times"></i>), которая удаляет выбранный элемент плейлиста. Он доступен только тогда, когда Вы выберете элемент плейлиста нажав на него.</li>
+								<li>Самая последняя кнопка расположенная на правом боке первой колонки (<i className="fas fa-times"></i>) удаляет выбранный элемент плейлиста. Он доступен только тогда, когда Вы выберете элемент плейлиста нажав на него.</li>
 							</ul>
 
 							Во второй колонке находятся настройки выбранного элемента плейлиста. После изменения настроек, они мгновенно применянтся в выбранному элементу плейлиста.
 						</li>
-						<li>Сохраненный файл будет с расширением .m3u, его можно воспроизводить на устройствах и в плеерах, способных воспроизводить этот формат (например: VLC player, смарт приставки к ТВ и т.д.).</li>
+						<li>Выходной файл будет с расширением .m3u, который можно воспроизводить на устройствах и плеерах, способных воспроизводить этот формат (например: VLC player, смарт приставки к ТВ и т.д.).</li>
 						<li>Желаем приятного просмотра!</li>
 					</ul>
 
@@ -71,7 +71,7 @@ class RulesSubpage extends Component {
 
 				<div className="rules-confirm form-check">
 					<input type="checkbox" className="form-check-input" id="rulesConfirmCheckbox" onChange={this.confirmRules.bind(this)} />
-					<label className="form-check-label" htmlFor="rulesConfirmCheckbox">Я согласен с правилами программы</label>
+					<label className="form-check-label" htmlFor="rulesConfirmCheckbox">Я согласен с правилами сервиса</label>
 				</div>
 			</Card>
 		);
