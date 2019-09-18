@@ -118,17 +118,17 @@ router.post('/register', async (req, res) => {
 							queryArgs
 						).then(() => sendEmail(registrationEmailField, userActivationHash));
 
-						res.redirect(201, '/register/success');
+						res.sendStatus(201);
 					});
 				});
 			}
 			else {
-				res.render('index');
+				res.sendStatus(403);
 			}
 		});
 	}
 	else {
-		res.render('index');
+		res.sendStatus(403);
 	}
 });
 

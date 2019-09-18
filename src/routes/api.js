@@ -47,11 +47,11 @@ router.get('/login', (req, res) => {
 	}
 });
 
-router.post('/login', passport.authenticate('local', {
-	successRedirect: '/app',
-	failureRedirect: '/login'
-}), (req, res) => {
-	res.redirect(`/user/${req.user.username}`);
+router.post('/login', passport.authenticate('local'), (req, res) => {
+	if (Object.entries(req.user).length === 0 || req.user === Object) {
+		res.sendStatus(403);
+	}
+	res.sendStatus(200);
 });
 
 /**

@@ -8,6 +8,8 @@ class RegistrationSubpage extends Component {
 		super(props);
 
 		this.state = {
+			isInvalid: false,
+
 			login: '',
 			isLoginValid: false,
 			loginError: 'Логин должен быть написан латиницей, хотя бы 4 символа в длину.',
@@ -110,7 +112,18 @@ class RegistrationSubpage extends Component {
 						},
 						body: JSON.stringify(submitObj)
 					})
-						.then(() => window.location.href = '/register/success');
+						.then(res => {
+							switch (res.status) {
+								case 201:
+									window.location.href = `${window.location.origin}/register/success`;
+									break;
+							
+								default:
+									this.setState({ isInvalid: true });
+									break;
+							}
+							
+						});
 				}
 				else {
 					this.setState({
@@ -126,6 +139,10 @@ class RegistrationSubpage extends Component {
 
 		return (
 			<Card title="Регистрация" footer={cardFooter} className={this.props.currentTab === 'registration' ? 'active' : 'unactive'}>
+				<div className="alert alert-danger">
+					Форма регистрации была не правильно заполнена!
+				</div>
+
 				<form action="/register" method="POST" noValidate>
 					<div className={`form-group${this.state.isLoginValid ? '' : ' invalid'}`}>
 						<label htmlFor="registrationLoginField">Логин:</label>
