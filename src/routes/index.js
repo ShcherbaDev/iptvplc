@@ -8,71 +8,41 @@ const validateCaptcha = require('../modules/validateCaptcha');
 
 router.get('/', (req, res) => {
 	if (req.user === undefined) {
-		res.render('index');
+		return res.render('index');
 	}
-	else {
-		res.redirect('/app');
-	}
+
+	return res.redirect('/app');
 });
 
 router.get('/app', (req, res) => {
 	if (req.user !== undefined) {
-		res.render('index');
+		return res.render('index');
 	}
-	else {
-		res.redirect('/');
-	}
+
+	return res.redirect('/');
 });
 
 router.get('/login', (req, res) => {
 	if (req.user === undefined) {
-		res.render('index');
+		return res.render('index');
 	}
-	else {
-		res.redirect('/app');
-	}
+
+	return res.redirect('/app');
 });
 
 router.get('/register', (req, res) => {
-	res.render('index');
+	return res.render('index');
 });
 
 router.get('/register/success', (req, res) => {
 	if (req.user === undefined) {
-		res.render('index');
+		return res.render('index');
 	}
-	else {
-		res.redirect('/app');
-	}
+
+	return res.redirect('/app');
 });
 
 router.post('/register', async (req, res) => {
-	function registerUser(query, fields) {
-		return new Promise((resolve, reject) => {
-			db.query(query, fields, (queryErr) => {
-				if (queryErr) {
-					reject(queryErr);
-				}
-
-				resolve(fields);
-			});
-		});
-	}
-
-	function sendEmail(email, userActivationHash) {
-		const {
-			APP_PROTOCOL, APP_DOMAIN, APP_PORT, MAIL_USER
-		} = process.env;
-		const appDomain = process.env.NODE_ENV === 'dev' ? `${APP_PROTOCOL}://${APP_DOMAIN}:${APP_PORT}` : `${APP_PROTOCOL}://${APP_DOMAIN}`;
-
-		return mailManager.sendMail({
-			from: MAIL_USER,
-			to: email,
-			subject: 'Подтверждение аккаунта',
-			text: `Пожалуйста, подтвердите свой аккаунт по данной ссылке: ${appDomain}/activate/${userActivationHash}\n------------\nС уважением,\nАдминистрация IPTVPLC`
-		});
-	}
-
 	const {
 		registrationLoginField,
 		registrationEmailField,
@@ -91,19 +61,19 @@ router.post('/register', async (req, res) => {
 	) {
 		db.query(`SELECT * FROM users WHERE username='${registrationLoginField}'`, (findUserErr, val) => {
 			if (findUserErr) {
-				throw new Error(findUserErr);
+				return res.sendStatus(500);
 			}
 
 			// If user wasn't found
 			if (val.length === 0) {
 				bcrypt.genSalt(10, (err, salt) => {
 					if (err) {
-						throw new Error(err);
+						return res.sendStatus(500);
 					}
 
 					bcrypt.hash(registrationPasswordField, salt, (error, hash) => {
 						if (error) {
-							throw new Error(error);
+							return res.sendStatus(500);
 						}
 
 						const userPassword = hash;
@@ -111,50 +81,60 @@ router.post('/register', async (req, res) => {
 
 						const CURRENT_TIMESTAMP = { toSqlString: () => 'CURRENT_TIMESTAMP()' };
 
+						const query = 'INSERT INTO `users` (username, password, email, registration_date, activation_hash) VALUES (?, ?, ?, ?, ?)';
 						const queryArgs = [registrationLoginField, userPassword, registrationEmailField, CURRENT_TIMESTAMP, userActivationHash];
 
-						registerUser(
-							'INSERT INTO `users` (username, password, email, registration_date, activation_hash) VALUES (?, ?, ?, ?, ?)',
-							queryArgs
-						).then(() => sendEmail(registrationEmailField, userActivationHash));
+						db.query(query, queryArgs, (queryErr) => {
+							if (queryErr) {
+								return res.sendStatus(500);
+							}
 
-						res.sendStatus(201);
+							const {
+								APP_PROTOCOL, APP_DOMAIN, APP_PORT, MAIL_USER
+							} = process.env;
+							const appDomain = process.env.NODE_ENV === 'development' ? `${APP_PROTOCOL}://${APP_DOMAIN}:${APP_PORT}` : `${APP_PROTOCOL}://${APP_DOMAIN}`;
+
+							mailManager.sendMail({
+								from: MAIL_USER,
+								to: registrationEmailField,
+								subject: 'Подтверждение аккаунта',
+								text: `Пожалуйста, подтвердите свой аккаунт по данной ссылке: ${appDomain}/activate/${userActivationHash}\n------------\nС уважением,\nАдминистрация IPTVPLC`
+							}, () => {
+								return res.sendStatus(201);
+							});
+						});
 					});
 				});
 			}
 			else {
-				res.sendStatus(403);
+				return res.sendStatus(403);
 			}
 		});
 	}
 	else {
-		res.sendStatus(403);
+		return res.sendStatus(403);
 	}
 });
 
 router.get('/activate/:hash', (req, res) => {
-	function loginUser(userData) {
-		req.login(userData, (loginErr) => {
-			if (loginErr) {
-				throw new Error(loginErr);
-			}
-
-			res.redirect('/app');
-		});
-	}
-
 	db.query(`SELECT * FROM users WHERE activation_hash = '${req.params.hash}'`, (err, val) => {
 		if (err) {
-			throw new Error(err);
+			return res.sendStatus(500);
 		}
 
 		if (val.length > 0 && val[0].active === 0) {
 			db.query(`UPDATE users SET active = 1 WHERE activation_hash = '${req.params.hash}'`, (error) => {
 				if (error) {
-					throw new Error(error);
+					return res.sendStatus(500);
 				}
 
-				loginUser(val[0]);
+				req.login(val[0], (loginErr) => {
+					if (loginErr) {
+						return res.sendStatus(500);
+					}
+		
+					return res.redirect('/app');
+				});
 			});
 		}
 	});

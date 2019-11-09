@@ -17,7 +17,8 @@ module.exports.create = () => {
 		auth: {
 			user: MAIL_USER,
 			pass: MAIL_PASS
-		}
+		},
+		sendmail: true
 	};
 
 	if (MAIL_HOST === 'smtp.gmail.com') {

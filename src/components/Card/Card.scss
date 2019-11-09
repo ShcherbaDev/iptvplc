@@ -3,8 +3,10 @@
 
     .card {
         border-color: rgba(0, 0, 0, .69);
+        border-radius: 1px;
         
         .card-header, .card-footer {
+            border-radius: 0;
             background-color: rgba(0, 0, 0, .76);
             color: #fff;
         }

@@ -21,7 +21,7 @@ class Site extends Component {
 		};
 	}
 
-	componentWillMount() {
+	componentDidMount() {
 		isUserLoggedIn()
 			.then((data) => {
 				if (data !== undefined) {

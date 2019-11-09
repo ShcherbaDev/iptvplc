@@ -5,15 +5,15 @@ import encodeM3U from '../../../../assets/js/encodeM3U';
 
 import './Editor.scss';
 
+import Search from '../../../../components/Search/Search';
 import Modal from '../../../../components/Modal/Modal';
 import Card from '../../../../components/Card/Card';
 import Loading from '../../../../components/Loading/Loading';
 
-import isObjectEmpty from '../../../../assets/js/isObjectEmpty';
-
 import SimpleChannel from './components/addPlaylistItemModals/SimpleChannel'; 
 import YoutubeVideoModal from './components/addPlaylistItemModals/YoutubeVideo/YoutubeVideo';
 import ImageModal from './components/addPlaylistItemModals/Image/Image';
+import isObjectEmpty from '../../../../assets/js/isObjectEmpty';
 
 class Editor extends Component {
 	constructor(props) {
@@ -22,6 +22,8 @@ class Editor extends Component {
 		this.state = {
 			imageThumbnail: '',
 			isAddBtnDisabled: true,
+
+			playlist: {},
 
 			isModalOpen: false,
 			modalContent: '',
@@ -32,8 +34,20 @@ class Editor extends Component {
 				style: {}
 			}
 		};
+	}
 
-		this.savePlaylist = this.savePlaylist.bind(this);
+	static getDerivedStateFromProps(props, state) {
+		if (isObjectEmpty(state.playlist)) {
+			state = {
+				...state,
+				playlist: {
+					...props.playlist,
+					filteredPlaylistData: props.playlist.data
+				}
+			};
+		}
+		
+		return state;
 	}
 
 	onModalClose() {
@@ -56,18 +70,28 @@ class Editor extends Component {
 	}
 
 	togglePlaylistItemActive(playlistItemId, isCtrlKeyPressed) {
-		const activePlaylistItemIndex = this.props.appStore.playlist.data.findIndex(it => it.active);
-
 		if (!isCtrlKeyPressed) {
-			// If one of the playlist items is selected
-			// if (activePlaylistItemIndex !== -1 && playlistItemId !== this.props.appStore.playlist.data[activePlaylistItemIndex].id) {
-			// 	this.props.onTogglePlaylistItemActive(
-			// 		this.props.appStore.playlist.data[activePlaylistItemIndex].id
-			// 	);
-			// }
-			// else {
-				this.props.onTogglePlaylistItemActive(playlistItemId);
-			// }
+			this.props.onTogglePlaylistItemActive(playlistItemId);
+
+			const newData = {
+				...this.state.playlist.data[this.state.playlist.data.findIndex(item => item.active)],
+				active: !this.state.playlist.data[this.state.playlist.data.findIndex(item => item.active)].active
+			};
+
+			let filteredData = this.state.playlist.data;
+			filteredData[this.state.playlist.data.findIndex(item => item.active)].acitve = !this.state.playlist.data[this.state.playlist.data.findIndex(item => item.active)].active
+
+			this.setState({
+				playlist: {
+					...this.state.playlist,
+					filteredPlaylistData: [
+						...this.state.playlist.filteredPlaylistData,
+						[this.state.playlist.filteredPlaylistData.findIndex(item => item.active)]: {
+							...
+						}
+					]
+				}
+			});
 		}
 	}
 
@@ -203,10 +227,10 @@ class Editor extends Component {
 				title: 'Сохранение плейлиста...',
 				onClose: undefined
 			}
-		})
+		});
 		
-		fetch('/api/savePlaylist', {
-			method: 'POST',
+		fetch(`${window.location.origin}/api/savePlaylist`, {
+			method: 'PUT',
 			headers: {
 				'Content-Type': 'application/json'
 			},
@@ -229,7 +253,10 @@ class Editor extends Component {
 							modalData: {
 								title: 'Ошибка!',
 								footer: undefined,
-								onClose: this.onModalClose()
+								onClose: this.onModalClose.bind(this),
+								style: {
+									width: '44vw'
+								}
 							}
 						});
 						break;
@@ -244,20 +271,95 @@ class Editor extends Component {
 					modalData: {
 						title: 'Сохранение плейлиста прошло успешно!',
 						footer: (
-							<a className="btn btn-block btn-outline-success" href={response}>Скачать</a>
+							<a className="btn btn-block btn-outline-success" href={response} download={this.props.appStore.playlist.filename}>Скачать</a>
 						),
-						onClose: this.onModalClose.bind(this)
+						onClose: this.onModalClose.bind(this),
+						style: {
+							width: '44vw'
+						}
 					}
 				});
 			});
 	}
 
+	backToHubModalOpen() {
+		this.clearModalData();
+		this.setState({
+			isModalOpen: true,
+			modalContent: (
+				<p className="mb-0">
+					Вы уверены, что хотите вернуться к списку плейлистов?<br />
+					Все несохраненные изменения будут утеряны.
+				</p>
+			),
+			modalData: {
+				title: 'Внимание!',
+				footer: (
+					<a className="btn btn-block btn-outline-success" href="/app">Ок</a>
+				),
+				onClose: this.onModalClose.bind(this),
+				style: {
+					width: '44vw'
+				}
+			}
+		});
+	}
+
+	deletePlaylistItemConfirmModal() {
+		const activePlaylistItems = this.props.playlist.data.findIndex(it => it.active);
+
+		this.clearModalData();
+		this.setState({
+			isModalOpen: true,
+			modalContent: (
+				<p className="mb-0">
+					Вы уверены, что хотите удалить "{this.props.playlist.data[activePlaylistItems].name}"?
+				</p>
+			),
+			modalData: {
+				title: 'Внимание!',
+				footer: (
+					<button className="btn btn-block btn-outline-success" onClick={() => {
+						this.props.onDeletePlaylistItem(this.props.playlist.data[activePlaylistItems].id);
+						this.onModalClose();
+					}}>Да</button>
+				),
+				onClose: this.onModalClose.bind(this),
+				style: {
+					width: '44vw'
+				}
+			}
+		});
+	}
+
+	doSearch(event) {
+		const val = event.target.value;
+		const playlistData = this.state.playlist.data;
+
+		let currentList = [];
+		let newList = [];
+
+		if (val !== '') {
+			currentList = playlistData;
+			newList = currentList.filter(item => item.name.includes(val));
+		} 
+		else {
+			newList = playlistData;
+		}
+
+		this.setState({
+			playlist: {
+				...this.state.playlist,
+				filteredPlaylistData: newList
+			}
+		});
+	}
+
 	render() {
-		if (
-			(!isObjectEmpty(this.props.appStore.playlist) && this.props.appStore.playlist.data.length >= 1)
-			|| this.props.appStore.playlist.isEmpty
-		) {
-			const playlistItems = this.props.appStore.playlist.data.map(item => {
+		const { playlist } = this.state;
+		const { filteredPlaylistData } = playlist;
+
+			const playlistItems = filteredPlaylistData.length > 0 && filteredPlaylistData.map(item => {
 				return (
 					<button
 						className={`list-group-item list-group-item-action${item.active ? ' active' : ''}`}
@@ -283,35 +385,20 @@ class Editor extends Component {
 				);
 			});
 
-			const playlistItemsList = !this.props.appStore.playlist.isEmpty ? (
-				<div className="list-group list-group-flush" style={{ padding: 8 }}>
-					{playlistItems}
-				</div>
-			) : (
-				<p style={{
-					display: "flex",
-					justifyContent: "center",
-					alignItems: "center",
-					height: "100%",
-					marginBottom: 0,
-					textAlign: "center"
-				}}>Ваш плейлист пуст!<br/>Исправьте это!</p>
-			);
-
-			const activePlaylistItems = this.props.appStore.playlist.data.findIndex(it => it.active);
+			const activePlaylistItems = filteredPlaylistData.findIndex(it => it.active);
 
 			const simpleChannelSettings = activePlaylistItems !== -1 && (
-				<Fragment>
+				<>
 					<div className="form-group">
 						<label htmlFor="channelName">Название канала:</label>
 						<input type="text" className="form-control" id="channelName" 
-							value={this.props.appStore.playlist.data[activePlaylistItems].name}
+							value={filteredPlaylistData[activePlaylistItems].name}
 							onChange={e => this.props.onChangePlaylistItem(activePlaylistItems, 'name', e.target.value)} />
 					</div>
 					<div className="form-group">
 						<label htmlFor="channelIcon">URL иконки:</label>
 						<input type="url" className="form-control" id="channelIcon" 
-							value={this.props.appStore.playlist.data[activePlaylistItems].icon}
+							value={filteredPlaylistData[activePlaylistItems].icon}
 							onChange={e => {
 								this.props.onChangePlaylistItem(activePlaylistItems, 'icon', e.target.value);
 							}} />
@@ -319,12 +406,12 @@ class Editor extends Component {
 					<div className="form-group">
 						<label htmlFor="channelUrl">URL:</label>
 						<input type="url" className="form-control" id="channelUrl"
-							value={this.props.appStore.playlist.data[activePlaylistItems].url}
+							value={filteredPlaylistData[activePlaylistItems].url}
 							onChange={e => {
 								this.props.onChangePlaylistItem(activePlaylistItems, 'url', e.target.value);
 							}} />
 					</div>
-				</Fragment>
+				</>
 			);
 
 			const youtubeVideoSettings = activePlaylistItems !== -1 && (
@@ -332,7 +419,7 @@ class Editor extends Component {
 					<label htmlFor="youtubeVideoUrl">URL видео:</label>
 					<input type="url" id="youtubeVideoUrl" className="form-control"
 						placeholder="https://youtube.com/..."
-						value={this.props.appStore.playlist.data[activePlaylistItems].url}
+						value={filteredPlaylistData[activePlaylistItems].url}
 						onChange={e => this.props.onChangeYoutubePlaylistItem(activePlaylistItems, e.target.value)} />
 				</div>
 			);
@@ -341,59 +428,75 @@ class Editor extends Component {
 				<div className="form-group">
 					<label htmlFor="imageUrl">URL картинки:</label>
 					<input type="url" id="imageUrl" className="form-control"
-						value={this.props.appStore.playlist.data[activePlaylistItems].url}
+						value={filteredPlaylistData[activePlaylistItems].url}
 						onChange={e => this.props.onChangeImagePlaylistItem(activePlaylistItems, e.target.value)} />
 				</div>
 			);
-				
+
 			return (
-				<Fragment>
+				<>
 					<div className="container content">
 						<Card bodyStyle={{ padding: 0 }}>
 							<div className="grid-container" style={{
-								display: "grid",
-								gridTemplateColumns: "1fr 1fr",
-								gridTemplateRows: "0fr 1fr",
+								display: 'grid',
+								gridTemplateColumns: '1fr 1fr',
+								gridTemplateRows: '0fr 1fr',
 								gridTemplateAreas: `"buttons settings" "list settings"`,
 								overflowY: 'auto',
 								height: '65vh'
 							}}>
 								<div className="buttons" style={{
-									gridArea: "buttons",
-									display: "flex",
-									flexDirection: "row",
-									justifyContent: "space-between",
-									padding: "0 14px",
-									backgroundColor: "rgba(22, 22, 22, .3)"
+									gridArea: 'buttons',
+									display: 'flex',
+									flexDirection: 'row',
+									justifyContent: 'space-between',
+									padding: '0 14px',
+									backgroundColor: 'rgba(22, 22, 22, .3)'
 								}}>
-									<div className="left">
-										<div className="btn-group mr-2">
-											<button className="btn btn-dark" onClick={() => this.addPlaylistItemRequest('simpleChannel')}>
+									<div className="left-part">
+										<button type="button" className="btn btn-dark" onClick={this.backToHubModalOpen.bind(this)} title="Вернутся к списку плейлистов">
+											<i className="fas fa-arrow-left"></i>
+										</button>
+										<div className="btn-group ml-3">
+											<button type="button" className="btn btn-dark" onClick={() => this.addPlaylistItemRequest('simpleChannel')} title="Добавить новый элемент плейлиста">
 												<i className="fas fa-plus"></i>
 											</button>
-											<button className="btn btn-dark" onClick={() => this.addPlaylistItemRequest('youtube')}>
+											<button type="button" className="btn btn-dark" onClick={() => this.addPlaylistItemRequest('youtube')} title="Добавить в плейлист видео с Youtube">
 												<i className="fab fa-youtube"></i>
 											</button>
-											<button className="btn btn-dark" onClick={() => this.addPlaylistItemRequest('image')}>
+											<button type="button" className="btn btn-dark" onClick={() => this.addPlaylistItemRequest('image')} title="Добавить изображение в плейлист">
 												<i className="fas fa-image"></i>
 											</button>
 										</div>
-										<button className="btn btn-dark" onClick={this.savePlaylist}>
-											<i className="fas fa-download"></i>
-										</button>
 									</div>
-									<div className="right">
-										<button className="btn btn-dark" disabled={activePlaylistItems === -1} onClick={() => this.props.onDeletePlaylistItem(this.props.appStore.playlist.data[activePlaylistItems].id)}>
-											<i className="fas fa-times"></i>
-										</button>
-									</div>
+									<button type="button" className="btn btn-dark" onClick={this.savePlaylist.bind(this)} title="Сохранить плейлист">
+										<i className="fas fa-save"></i>
+									</button>
 								</div>
 								<div className="list" style={{
 									gridArea: "list",
 									overflowY: "auto",
 									overflowX: "hidden"
 								}}>
-									{playlistItemsList}
+									{this.state.playlist.data.length > 0 ? (
+										<>
+											<div className="search-container mx-3">
+												<Search onChange={this.doSearch.bind(this)} placeholder="Поиск по названию элемента плейлиста..." />
+											</div>
+											<div className="list-group list-group-flush" style={{ padding: 8 }}>
+												{playlistItems}
+											</div>
+										</>
+									) : (
+										<p style={{
+											display: "flex",
+											justifyContent: "center",
+											alignItems: "center",
+											height: "100%",
+											marginBottom: 0,
+											textAlign: "center"
+										}}>На данный момент плейлист пуст!</p>
+									)}
 								</div>
 								<div className="settings" style={{
 									gridArea: "settings",
@@ -402,21 +505,29 @@ class Editor extends Component {
 									backgroundColor: "rgba(22, 22, 22, .3)",
 									borderLeft: "1px solid #555"
 								}}>
-									{activePlaylistItems !== -1 ? (() => {
-										switch (this.props.appStore.playlist.data[activePlaylistItems].type) {
-											case 'simpleChannel':
-												return simpleChannelSettings;
-
-											case 'youtube':
-												return youtubeVideoSettings;
-
-											case 'image':
-												return imageSettings;
-										
-											default:
-												return simpleChannelSettings;
-										}
-									})() : <p style={{
+									{activePlaylistItems !== -1 ? (
+										<>
+											{(() => {
+												switch (filteredPlaylistData[activePlaylistItems].type) {
+													case 'simpleChannel':
+														return simpleChannelSettings;
+		
+													case 'youtube':
+														return youtubeVideoSettings;
+		
+													case 'image':
+														return imageSettings;
+												
+													default:
+														return simpleChannelSettings;
+												}
+											})()}
+											
+											<button className="btn btn-dark" onClick={this.deletePlaylistItemConfirmModal.bind(this)} title="Удалить элемент плейлиста">
+												<i className="fas fa-trash-alt"></i>
+											</button>
+										</>
+									) : <p style={{
 										display: "flex",
 										justifyContent: "center",
 										alignItems: "center",
@@ -429,15 +540,8 @@ class Editor extends Component {
 						</Card>
 					</div>
 					{this.state.isModalOpen && <Modal {...this.state.modalData}>{this.state.modalContent}</Modal>}
-				</Fragment>
-			)
-		}
-
-		return (
-			<div className="container content">
-				<Loading />
-			</div>
-		);
+				</>
+			);
 	}
 }
 
@@ -484,9 +588,9 @@ export default connect(
 		},
 
 		onChangeImagePlaylistItem(playlistItemIndex, imageUrl) {
-			const iconUrlRegex = /(https?:\/\/.*\.(?:png|jpg|gif|svg|webp))/i;
+			const imageUrlRegex = /(https?:\/\/.*\.(?:png|jpg|gif|svg|webp))/i;
 
-			if (iconUrlRegex.test(imageUrl)) {
+			if (imageUrlRegex.test(imageUrl)) {
 				dispatch({
 					type: 'CHNAGE_IMAGE_PLAYLIST_ITEM',
 					payload: {

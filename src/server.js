@@ -35,7 +35,7 @@ app.use(passport.session());
 app.use(indexRouter);
 app.use('/api', apiRouter);
 
-if (process.env.NODE_ENV === 'dev') {
+if (process.env.NODE_ENV === 'development') {
 	app.use(express.static('dist'));
 }
 else {

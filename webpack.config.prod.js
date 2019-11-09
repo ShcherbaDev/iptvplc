@@ -104,10 +104,6 @@ module.exports = {
 
 			{
 				from: './src/assets/fonts', to: './static/fonts'
-			},
-
-			{
-				from: './src/assets/playlists', to: './static/playlists'
 			}
 		]),
 

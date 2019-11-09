@@ -3,12 +3,14 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 
 import Card from '../../components/Card/Card';
+import Loading from '../../components/Loading/Loading';
 
 import Editor from './subpages/editor/Editor';
 import Hub from './subpages/hub/Hub';
 
 import fetchApi from '../../assets/js/fetchApi';
 import isUserLoggedIn from '../../assets/js/isUserLoggedIn';
+import isObjectEmpty from '../../assets/js/isObjectEmpty';
 
 class App extends Component {
 	constructor(props) {
@@ -40,7 +42,11 @@ class App extends Component {
 						return <Hub />;
 
 					case 'editor':
-						return <Editor />;
+						return isObjectEmpty(this.props.appStore.playlist) ? (
+							<div className="container loading">
+								<Loading />
+							</div>
+						) : <Editor playlist={this.props.appStore.playlist} />;
 					
 					default:
 						return (

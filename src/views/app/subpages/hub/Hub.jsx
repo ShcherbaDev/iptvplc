@@ -5,11 +5,13 @@ import Modal from '../../../../components/Modal/Modal';
 import Card from '../../../../components/Card/Card';
 import Loading from '../../../../components/Loading/Loading';
 
+import HubColumn from './components/HubColumn';
+import ToolsColumn from './components/columns/ToolsColumn';
+import RecentPlaylistsColumn from './components/columns/RecentPlaylistsColumn';
+
 import isUserLoggedIn from '../../../../assets/js/isUserLoggedIn';
 import fetchApi from '../../../../assets/js/fetchApi';
 import parseM3U from '../../../../assets/js/parseM3U';
-import ToolsColumn from './components/columns/ToolsColumn';
-import RecentPlaylistsColumn from './components/columns/RecentPlaylistsColumn';
 import isPlaylistMimeTypeValid from '../../../../assets/js/isPlaylistMimeTypeValid';
 
 class Hub extends Component {
@@ -19,6 +21,8 @@ class Hub extends Component {
 		this.state = {
 			recentPlaylists: [],
 			isRecentPlaylistsLoading: true,
+
+			showDragAndDropWindow: false,
 
 			isModalOpen: false,
 			modalContent: '',
@@ -49,19 +53,6 @@ class Hub extends Component {
 	}
 
 	onModalClose() {
-		this.setState({
-			isModalOpen: false,
-			modalContent: '',
-			modalData: {
-				title: undefined,
-				footer: undefined,
-				onClose: this.onModalClose.bind(this),
-				style: {}
-			}
-		});
-	}
-
-	clearModalData() {
 		this.setState({
 			isModalOpen: false,
 			modalContent: '',
@@ -118,7 +109,7 @@ class Hub extends Component {
 		const inputValue = document.getElementById('playlistNameInput');
 		if (inputValue.value !== '') {
 			isUserLoggedIn().then((loggedInData) => {
-				this.createPlaylistRequest(loggedInData.id, inputValue.value, 'data:audio/x-mpegurl;');
+				this.createPlaylistRequest(loggedInData.id, `${inputValue.value}.m3u`, 'data:audio/x-mpegurl;');
 			});
 		}
 		else {
@@ -130,57 +121,72 @@ class Hub extends Component {
 		document.getElementById('playlistFileDialog').click();
 	}
 
-	createPlaylistRequest(authorId, filename, filedata) {
-		fetch('/api/createPlaylist', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify({
-				user_id: authorId,
-				filename: filename.concat(!/\.m3u$/.test(filename) ? '.m3u' : ''),
-				filedata
+	createPlaylistModalResponse(response) {
+		this.onModalClose();
+		switch (response.status) {
+			case 201:
+				return response.json();
+			
+			case 400:
+				this.setState({
+					isModalOpen: true,
+					modalContent: (
+						<p>Расширение плейлиста должно быть <samp>.m3u</samp> или <samp>.m3u8</samp></p>
+					),
+					modalData: {
+						...this.state.modalData,
+						title: 'Ошибка!'
+					}
+				});
+				break;
+			
+			default:
+				this.setState({
+					isModalOpen: true,
+					modalContent: (
+						<p>Во время создания плейлиста произошла ошибка!<br/>Пожалуйста, попробуйте ещё раз.</p>
+					),
+					modalData: {
+						...this.state.modalData,
+						title: 'Ошибка!'
+					}
+				});
+				break;
+		}
+	}
+
+	createPlaylistRequest(authorId, fileName, fileData) {
+		if (/\.m3u8?$/.test(fileName)) {
+			fetch(`${window.location.origin}/api/createPlaylist`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({
+					user_id: authorId,
+					file_name: fileName,
+					file_data: fileData
+				})
 			})
-		})
-		.then(response => {
-			this.clearModalData();
-			switch (response.status) {
-				case 201:
-					return response.json()
-				
-				case 400:
-					this.setState({
-						isModalOpen: true,
-						modalContent: (
-							<p>Расширение плейлиста должно быть <samp>.m3u</samp></p>
-						),
-						modalData: {
-							...this.state.modalData,
-							title: 'Ошибка!'
-						}
-					});
-					break;
-				
-				default:
-					this.setState({
-						isModalOpen: true,
-						modalContent: (
-							<Fragment>
-								<p>Во время создания плейлиста произошла ошибка!<br/>Пожалуйста, попробуйте ещё раз.</p>
-								<p>Информация об ошибке: {err}</p>
-							</Fragment>
-						),
-						modalData: {
-							...this.state.modalData,
-							title: 'Ошибка!'
-						}
-					});
-					break;
-			}
-		})
-		.then(response => {
-			this.props.onSetPlaylistData(response.newPlaylistId);
-		})
+			.then(response => {
+				return this.createPlaylistModalResponse(response);
+			})
+			.then(response => {
+				return this.props.onSetPlaylistData(response.newPlaylistId);
+			});
+		}
+		else {
+			this.setState({
+				isModalOpen: true,
+				modalContent: (
+					<p>Расширение плейлиста должно быть <samp>.m3u</samp> или <samp>.m3u8</samp></p>
+				),
+				modalData: {
+					...this.state.modalData,
+					title: 'Ошибка!'
+				}
+			});
+		}
 	}
 
 	onOpenPlaylist(event) {
@@ -198,7 +204,7 @@ class Hub extends Component {
 			reader.readAsDataURL(event.target.files[0]);
 		}
 		else {
-			this.clearModalData();
+			this.onModalClose();
 			this.setState({
 				isModalOpen: true,
 				modalContent: (
@@ -214,8 +220,116 @@ class Hub extends Component {
 	}
 
 	onLoadAppData(playlistId, event) {
-		if (event.target.nodeName === 'DIV') {
+		if (
+			event.target.nodeName === 'DIV'
+			|| (event.target.offsetParent.nodeName === 'DIV'
+				&& event.target.offsetParent.className.includes('playlist-item'))
+		) {
 			this.props.onSetPlaylistData(playlistId);
+		}
+	}
+
+	renamePlaylistRequest(playlistId) {
+		const playlists = this.state.recentPlaylists;
+		const requestedPlaylistIndex = playlists.findIndex(item => item.id === playlistId);
+
+		this.setState({
+			isModalOpen: true,
+			modalContent: (
+				<div className="form-group">
+					<label htmlFor="playlistNewNameInput">Новое имя плейлиста:</label>
+					<div className="input-group">
+						<input
+							type="text"
+							className="form-control"
+							id="playlistNewNameInput"
+							defaultValue={playlists[requestedPlaylistIndex].filename.split(/\.m3u8?$/, 1)[0]}
+							maxLength="255" />
+						<div className="input-group-append">
+							<span className="input-group-text">{playlists[requestedPlaylistIndex].filename.match(/\.m3u8?$/)[0]}</span>
+						</div>
+					</div>
+				</div>
+			),
+			modalData: {
+				...this.state.modalData,
+				style: {
+					width: '78vw'
+				},
+				title: 'Имя нового плейлиста',
+				footer: (
+					<button className="btn btn-block btn-outline-success" onClick={this.onRenamePlaylist.bind(this, playlistId)}>Переименовать</button>
+				)
+			}
+		});
+	}
+
+	onRenamePlaylist(playlistId) {
+		const inputValue = document.getElementById('playlistNewNameInput');
+
+		const playlists = this.state.recentPlaylists;
+		const requestedPlaylistIndex = playlists.findIndex(item => item.id === playlistId);
+
+		if (inputValue.value !== '') {
+			isUserLoggedIn().then(async () => {
+				fetch(`${window.location.origin}/api/renamePlaylist`, {
+					method: 'PUT',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({
+						id: playlistId,
+						newPlaylistName: `${inputValue.value}${playlists[requestedPlaylistIndex].filename.match(/\.m3u8?$/)[0]}`
+					})
+				})
+				.then(response => {
+					this.onModalClose();
+
+					switch (response.status) {
+						case 200:
+							this.setState({
+								isModalOpen: true,
+								modalContent: (
+									<p>Плейлист "<samp>{playlists[requestedPlaylistIndex].filename}</samp>" был успешно переименован!</p>
+								),
+								modalData: {
+									...this.state.modalData,
+									title: 'Внимание!',
+									footer: (
+										<button className="btn btn-block btn-outline-success" onClick={() => location.reload()}>Ок</button>
+									),
+									onClose: undefined,
+									style: {
+										width: '44vw'
+									}
+								}
+							});
+							break;
+						
+						default:
+							this.setState({
+								isModalOpen: true,
+								modalContent: (
+									<p>Во время переименования плейлиста произошла ошибка!<br/>Пожалуйста, попробуйте ещё раз.</p>
+								),
+								modalData: {
+									...this.state.modalData,
+									title: 'Ошибка!',
+									footer: (
+										<button className="btn btn-block btn-outline-success" onClick={this.onModalClose.bind(this)}>Ок</button>
+									),
+									style: {
+										width: '44vw'
+									}
+								}
+							});
+							break;
+					}
+				});
+			});
+		}
+		else {
+			inputValue.focus();
 		}
 	}
 
@@ -242,7 +356,7 @@ class Hub extends Component {
 	}
 
 	onDeletePlaylist(playlistId) {
-		fetch('/api/deletePlaylist', {
+		fetch(`${window.location.origin}/api/deletePlaylist`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json'
@@ -252,7 +366,7 @@ class Hub extends Component {
 			})
 		})
 		.then(response => {
-			this.clearModalData();
+			this.onModalClose();
 
 			switch (response.status) {
 				case 200:
@@ -300,39 +414,80 @@ class Hub extends Component {
 		});
 	}
 
+	onDropCapture(e) {
+		e.preventDefault();
+
+		const files = e.dataTransfer.files;
+		
+		this.setState({ showDragAndDropWindow: false });
+
+		isUserLoggedIn().then(async () => {
+			const formData = new FormData();
+
+			formData.append('file', files[0]);
+
+			const req = await fetch('/api/upload', {
+				method: 'POST',
+				body: formData
+			});
+			const res = await this.createPlaylistModalResponse(req);
+
+			this.props.onSetPlaylistData(res.newPlaylistId);
+		});
+	}
+
 	render() {
-		const recentPlaylists = this.state.recentPlaylists.map(item =>
-			<div className="list-group-item list-group-item-action"
-				key={item.id.toString()}
-				onClick={e => this.onLoadAppData(item.id, e)}>
-				{item.filename}<br/>
-				Дата создания: {new Date(item.creation_date).toLocaleDateString('ru-RU', {
-					dateStyle: 'medium'
-				})}<br/>
-				Дата последнего изменения: {new Date(item.last_edit_date).toLocaleDateString('ru-RU', {
-					dateStyle: 'medium'
-				})}
-
-				<button onClick={this.deletePlaylistRequest.bind(this, item.id)} 
-					style={{ position: "absolute", top: 0, right: 0 }}
-					className="btn btn-black">
-					<i className="fas fa-times"></i>
-				</button>
-			</div>
-		);
-
 		return (
 			<Fragment>
 				<div className="content container">
 					{!this.state.isRecentPlaylistsLoading ? (
-						<Card>
-							<div className="container-fluid">
-								<div className="row">
-									{recentPlaylists.length > 0 && <RecentPlaylistsColumn recentPlaylists={recentPlaylists} />}
-									<ToolsColumn
-										onCreateNewPlaylistButtonClick={this.onCreateNewPlaylistButtonClick}
-										onOpenPlaylistFileDialog={this.openPlaylistFileDialog} />
-								</div>
+						<Card bodyStyle={{ display: 'inline-flex' }}>
+							<div
+								className="row w-100"
+								onDragOver={(e) => {
+									e.preventDefault();
+									this.setState({ showDragAndDropWindow: true });
+								}}
+								onDragLeave={(e) => {
+									e.preventDefault();
+									this.setState({ showDragAndDropWindow: false });
+								}}
+								onDropCapture={this.onDropCapture.bind(this)}
+							>
+								{!this.state.showDragAndDropWindow ? (
+									<>
+										{this.state.recentPlaylists.length > 0 && (
+											<HubColumn title="Предыдущие плейлисты:" className="recent h-100 d-flex flex-column col-12 col-lg-6 mt-2 mt-lg-0 order-1 order-lg-0">
+												<RecentPlaylistsColumn
+													recentPlaylists={this.state.recentPlaylists}
+													onLoadAppData={this.onLoadAppData.bind(this)}
+
+													deletePlaylistRequest={this.deletePlaylistRequest.bind(this)}
+													renamePlaylistRequest={this.renamePlaylistRequest.bind(this)} />
+											</HubColumn>
+										)}
+
+										<HubColumn className={`tools align-self-center ${this.state.recentPlaylists.length > 0 ? 'col-12 col-lg-6' : 'text-center col-12'} order-0 order-lg-1`}>
+											<ToolsColumn
+												onCreateNewPlaylistButtonClick={this.onCreateNewPlaylistButtonClick}
+												onOpenPlaylistFileDialog={this.openPlaylistFileDialog} />
+										</HubColumn>
+									</>
+								) : (
+									<div className="dropzone" style={{
+										border: '2px dashed #ccc',
+										width: '100%',
+										height: '100%',
+										display: 'flex',
+										flexDirection: 'column',
+										alignItems: 'center',
+										padding: '13% 0'
+									}}>
+										<i className="fas fa-upload" style={{ fontSize: 50, marginBottom: 12 }}></i>
+										Переместите сюда необходимый файл для редактирования
+										<small>Поддерживаются форматы .m3u и .m3u8</small>
+									</div>
+								)}
 							</div>
 						</Card>
 					) : <Loading />}
@@ -340,7 +495,7 @@ class Hub extends Component {
 				
 				<input
 					type="file"
-					accept={playlist_acceptable_mime_types}
+					accept=".m3u,.m3u8"
 					style={{ display: 'none' }}
 					id="playlistFileDialog"
 					onChange={this.onOpenPlaylist} />

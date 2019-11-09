@@ -33,7 +33,9 @@ class Card extends Component {
 							)}
 						</div>
 					)}
-					<div className="card-body" style={this.props.bodyStyle}>{this.props.children}</div>
+					<div
+						className={`card-body${this.props.bodyClassName !== undefined ? ` ${this.props.bodyClassName}` : ''}`}
+						style={this.props.bodyStyle}>{this.props.children}</div>
 					{this.props.footer !== undefined && <div className="card-footer">{this.props.footer}</div>}
 				</div>
 			</div>

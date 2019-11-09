@@ -7,11 +7,11 @@ class HubColumn extends Component {
 
 	render() {
 		const columnTitle = this.props.title && (
-			<h2 className="title">{this.props.title}</h2>
+			<h2 className="title mb-0">{this.props.title}</h2>
 		);
 		
 		return (
-			<div className={this.props.className ? `col ${this.props.className}` : 'col'}>
+			<div className={this.props.className || ''}>
 				{columnTitle}
 				{this.props.children}
 			</div>

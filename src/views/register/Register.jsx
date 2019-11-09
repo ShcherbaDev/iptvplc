@@ -17,7 +17,7 @@ class Register extends Component {
 		this.rulesSubpageRef = React.createRef();
 	}
 
-	componentWillMount() {
+	componentDidMount() {
 		if (window.location.pathname === '/register/success') {
 			this.setState({
 				currentTab: 'success'

@@ -1,4 +1,6 @@
 const router = require('express').Router();
+const multiparty = require('multiparty');
+const fs = require('fs');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const bcrypt = require('bcryptjs');
@@ -20,57 +22,97 @@ passport.use(new LocalStrategy((username, password, done) => {
 }));
 
 passport.serializeUser((user, done) => {
-	done(null, user);
+	return done(null, user);
 });
 
 passport.deserializeUser((user, done) => {
 	db.query(`SELECT * FROM users WHERE id='${user.id}'`, (err, queryUser) => {
-		done(err, queryUser);
+		return done(err, queryUser);
 	});
-});
-
-router.use((req, res, next) => {
-	res.set('Content-Type', 'application/json');
-	next();
 });
 
 // Login
 router.get('/login', (req, res) => {
 	if (req.user !== undefined) {
-		res.send({
+		return res.send({
 			isLoggedIn: true,
 			...req.user[0]
 		});
 	}
-	else {
-		res.send({ isLoggedIn: false });
-	}
+	
+	return res.send({ isLoggedIn: false });
 });
 
 router.post('/login', passport.authenticate('local'), (req, res) => {
 	if (Object.entries(req.user).length === 0 || req.user === Object) {
-		res.sendStatus(403);
+		return res.sendStatus(403);
 	}
-	res.sendStatus(200);
+	return res.sendStatus(200);
 });
 
-/**
- * Middleware for checking, if user is entering to api page via browser.
- * If it is - return 403 HTTP status, else - pass middleware.
- */
+function addPlaylist(fileName, fileMimeType, fileData, userId, res) {
+	const CURRENT_TIMESTAMP = { toSqlString: () => 'CURRENT_TIMESTAMP()' };
+
+	const query = 'INSERT INTO `playlists` (filename, mime_type, data, author_id, creation_date, last_edit_date) VALUES (?, ?, ?, ?, ?, ?)';
+	const queryArgs = [fileName, fileMimeType, fileData, userId, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP];
+
+	return db.query(query, queryArgs, (err, queryResult) => {
+		if (err) {
+			return res.sendStatus(500);
+		}
+		return res.status(201).send({ newPlaylistId: queryResult.insertId });
+	});
+}
+
+function getPlaylistMimeType(fileData) {
+	const mimeTypes = process.env.PLAYLIST_ACCEPTABLE_MIME_TYPES.split(', ');
+	const regExp = new RegExp(`^data:(${mimeTypes.join('|')});`);
+	return fileData.match(regExp)[1] || null;
+}
+
+router.post('/upload', (req, res) => {
+	const formData = new multiparty.Form();
+
+	return formData.parse(req, (err, fields, files) => {
+		if (err) {
+			return res.sendStatus(400);
+		}
+
+		const { originalFilename, path, headers } = files.file[0];
+
+		if (
+			process.env.PLAYLIST_ACCEPTABLE_MIME_TYPES
+			.includes(
+				headers['content-type']
+			)
+		) {
+			return fs.readFile(path, (readErr, data) => {
+				if (readErr) {
+					return res.sendStatus(500);
+				}
+
+				const fileData = `data:${headers['content-type']};base64,${new Buffer.from(data).toString('base64')}`;
+				return addPlaylist(originalFilename, headers['content-type'], fileData, req.user[0].id, res);
+			});
+		}
+
+		return res.sendStatus(400);
+	});
+})
+
 router.use((req, res, next) => {
 	if (req.headers['content-type'] === 'application/json') {
 		next();
 	}
 	else {
-		res.sendStatus(403);
+		return res.sendStatus(403);
 	}
 });
 
 // Logout
 router.get('/logout', (req, res) => {
 	req.logout();
-	res.redirect('/');
+	return res.redirect('/');
 });
 
 // User
@@ -106,7 +148,7 @@ router.get('/user/:id/playlists', (req, res) => {
 			throw new Error(err);
 		}
 
-		res.send(playlists);
+		return res.send(playlists);
 	});
 });
 
@@ -114,46 +156,48 @@ router.get('/user/:id/playlists', (req, res) => {
 router.get('/playlist/:id', (req, res) => {
 	const { id } = req.params;
 
-	const query = `SELECT * FROM playlists WHERE id='${id}'`;
-
-	db.query(query, (err, result) => {
+	const query = 'SELECT * FROM playlists WHERE id = ?';
+	db.query(query, id, (err, result) => {
 		if (err) {
-			console.error(`${err}\n---\nInput data:\nPlaylist id: ${id}`);
-			res.sendStatus(500);
+			return res.sendStatus(500);
 		}
-
+		
 		const trueRes = {
 			...result[0],
 			data: Buffer.from(result[0].data, 'base64').toString('utf8')
 		};
 
-		res.send(trueRes);
+		return res.send(trueRes);
 	});
 });
 
 router.post('/createPlaylist', (req, res) => {
-	const { user_id, filename, filedata } = req.body;
-
-	const mimeTypes = process.env.PLAYLIST_ACCEPTABLE_MIME_TYPES.split(', ');
-	const regExp = new RegExp(`^data:(${mimeTypes.join('|')});`);
-	const fileMimeType = filedata.match(regExp)[1];
-
-	if (regExp.test(filedata) && fileMimeType !== null) {
-		const query = 'INSERT INTO `playlists` (filename, mime_type, data, author_id) VALUES (?, ?, ?, ?)';
-		const queryArgs = [filename, fileMimeType, filedata, user_id];
-
-		db.query(query, queryArgs, (err, queryResult) => {
-			if (err) {
-				console.error(`${err}\n---\nInput data:\nUser id: ${user_id}\nFile name: ${filename}\nFile data: ${filedata.slice(0, 50)}...`);
-				res.sendStatus(500);
-			}
-			res.status(201).send({ newPlaylistId: queryResult.insertId });
-		});
+	const { user_id, file_name, file_data } = req.body;
+	
+	const playlistMimeType = getPlaylistMimeType(file_data);
+	
+	if (playlistMimeType !== null) {
+		return addPlaylist(file_name, playlistMimeType, file_data, user_id, res);
 	}
 	else {
-		res.sendStatus(400);
+		return res.sendStatus(400);
 	}
 });
+
+router.put('/renamePlaylist', (req, res) => {
+	const { id, newPlaylistName } = req.body;
+	const CURRENT_TIMESTAMP = { toSqlString: () => 'CURRENT_TIMESTAMP()' };
+
+	const query = 'UPDATE `playlists` SET filename = ?, last_edit_date = ? WHERE id = ?';
+	const queryArgs = [newPlaylistName, CURRENT_TIMESTAMP, id]
+
+	db.query(query, queryArgs, (err) => {
+		if (err) {
+			return res.sendStatus(500);
+		}
+		return res.status(200).send({ newPlaylistName });
+	});
+})
 
 router.post('/deletePlaylist', (req, res) => {
 	const { id } = req.body;
@@ -162,14 +206,13 @@ router.post('/deletePlaylist', (req, res) => {
 
 	db.query(query, id, (err) => {
 		if (err) {
-			console.log(`${err}\n---\nInput data:\nPlaylist id: ${id}`);
-			res.sendStatus(500);
+			return res.sendStatus(500);
 		}
-		res.sendStatus(200);
+		return res.sendStatus(200);
 	});
 });
 
-router.post('/savePlaylist', (req, res) => {
+router.put('/savePlaylist', (req, res) => {
 	const { playlist_id, new_data } = req.body;
 	const CURRENT_TIMESTAMP = { toSqlString: () => 'CURRENT_TIMESTAMP()' };
 
@@ -178,10 +221,9 @@ router.post('/savePlaylist', (req, res) => {
 
 	db.query(query, queryArgs, (err) => {
 		if (err) {
-			console.log(`${err}\n---\nInput data:\nPlaylist id: ${playlist_id}\nIs new playlist data empty: ${new_data.length < 1}`);
-			res.sendStatus(500);
+			return res.sendStatus(500);
 		}
-		res.status(200).send(new_data);
+		return res.status(200).send(new_data);
 	});
 });
 

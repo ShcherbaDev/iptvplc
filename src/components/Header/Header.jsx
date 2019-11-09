@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 
 import './Header.scss';
 
-import Dropdown from '../Dropdown/Dropdown';
 import Modal from '../Modal/Modal';
 
 import isUserLoggedIn from '../../assets/js/isUserLoggedIn';
@@ -63,7 +62,7 @@ class Header extends Component {
 		if (captchaResponse !== '') {
 			const { username, email, message } = this.state;
 
-			fetch('/api/sendMail', {
+			fetch(`${window.location.origin}/api/sendMail`, {
 				method: 'POST',
 				headers: new Headers({
 					'Content-Type': 'application/json',

@@ -21,7 +21,7 @@ class Contact extends Component {
 		if (captchaResponse !== '') {
 			const { name, email, message } = this.state;
 
-			fetch('/api/sendMail', {
+			fetch(`${window.location.origin}/api/sendMail`, {
 				method: 'POST',
 				headers: new Headers({
 					'Content-Type': 'application/json',

@@ -26,7 +26,7 @@ class LoginForm extends Component {
 	submitForm(e) {
 		e.preventDefault();
 
-		fetch('/api/login', {
+		fetch(`${window.location.origin}/api/login`, {
 			method: 'POST',
 			headers: new Headers({
 				'Content-Type': 'application/json',
@@ -36,7 +36,7 @@ class LoginForm extends Component {
 		}).then(res => {
 			switch (res.status) {
 				case 200:
-					location.href = `${origin}/app`;
+					window.location.href = `${window.location.origin}/app`;
 					break;
 			
 				default:
@@ -50,7 +50,7 @@ class LoginForm extends Component {
 		return (
 			<Fragment>
 				{this.state.isIncorrect && (
-					<div className="alert alert-secondary">
+					<div className="alert alert-danger">
 						Неверное имя пользователя или пароль!
 					</div>
 				)}

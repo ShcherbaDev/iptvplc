@@ -104,26 +104,24 @@ class RegistrationSubpage extends Component {
 						submitObj.referralUsername = referralUsername;
 					}
 
-					fetch('/register', {
+					fetch(`${window.location.origin}/register`, {
 						method: 'POST',
 						headers: {
 							'Content-Type': 'application/json',
 							'Accept': 'application/json'
 						},
 						body: JSON.stringify(submitObj)
-					})
-						.then(res => {
-							switch (res.status) {
-								case 201:
-									window.location.href = `${window.location.origin}/register/success`;
-									break;
-							
-								default:
-									this.setState({ isInvalid: true });
-									break;
-							}
-							
-						});
+					}).then(res => {
+						switch (res.status) {
+							case 201:
+								window.location.href = `${window.location.origin}/register/success`;
+								break;
+						
+							default:
+								this.setState({ isInvalid: true });
+								break;
+						}	
+					});
 				}
 				else {
 					this.setState({
@@ -139,9 +137,9 @@ class RegistrationSubpage extends Component {
 
 		return (
 			<Card title="Регистрация" footer={cardFooter} className={this.props.currentTab === 'registration' ? 'active' : 'unactive'}>
-				<div className="alert alert-danger">
+				{this.state.isInvalid && (<div className="alert alert-danger">
 					Форма регистрации была не правильно заполнена!
-				</div>
+				</div>)}
 
 				<form action="/register" method="POST" noValidate>
 					<div className={`form-group${this.state.isLoginValid ? '' : ' invalid'}`}>
