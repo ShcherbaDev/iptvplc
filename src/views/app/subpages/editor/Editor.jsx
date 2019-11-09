@@ -78,20 +78,7 @@ class Editor extends Component {
 				active: !this.state.playlist.data[this.state.playlist.data.findIndex(item => item.active)].active
 			};
 
-			let filteredData = this.state.playlist.data;
-			filteredData[this.state.playlist.data.findIndex(item => item.active)].acitve = !this.state.playlist.data[this.state.playlist.data.findIndex(item => item.active)].active
-
-			this.setState({
-				playlist: {
-					...this.state.playlist,
-					filteredPlaylistData: [
-						...this.state.playlist.filteredPlaylistData,
-						[this.state.playlist.filteredPlaylistData.findIndex(item => item.active)]: {
-							...
-						}
-					]
-				}
-			});
+			
 		}
 	}
 
