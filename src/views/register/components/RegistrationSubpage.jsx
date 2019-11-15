@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-import Card from '../../../components/Card/Card';
 
-import fetchApi from '../../../assets/js/fetchApi';
+import Card from 'components/Card/Card';
+
+import fetchApi from 'assets/js/fetchApi';
 
 class RegistrationSubpage extends Component {
 	constructor(props) {
@@ -27,7 +28,7 @@ class RegistrationSubpage extends Component {
 	validateLogin(event) {
 		const targetValue = event.target.value;
 
-		const isLoginValid = targetValue.length >= 4 && !/^\d+$/.test(targetValue.charAt(0));
+		const isLoginValid = targetValue.length >= 4 && !/[а-яёіїґ]/gi.test(targetValue);
 
 		this.setState({
 			login: targetValue,
@@ -98,12 +99,6 @@ class RegistrationSubpage extends Component {
 						captchaResponse: grecaptcha.getResponse()
 					};
 
-					const referralUsername = this.getCookie('referral');
-
-					if (referralUsername !== null) {
-						submitObj.referralUsername = referralUsername;
-					}
-
 					fetch(`${window.location.origin}/register`, {
 						method: 'POST',
 						headers: {
@@ -141,7 +136,7 @@ class RegistrationSubpage extends Component {
 					Форма регистрации была не правильно заполнена!
 				</div>)}
 
-				<form action="/register" method="POST" noValidate>
+				<form noValidate autoComplete="off">
 					<div className={`form-group${this.state.isLoginValid ? '' : ' invalid'}`}>
 						<label htmlFor="registrationLoginField">Логин:</label>
 						<input type="text" className="form-control" id="registrationLoginField" name="registrationLoginField" required onChange={this.validateLogin.bind(this)} />
@@ -171,7 +166,7 @@ class RegistrationSubpage extends Component {
 						<input type="password" className="form-control" id="registrationConfirmPasswordField" name="registrationConfirmPasswordField" required onChange={this.validateRepeatedPassword.bind(this)} />
 					
 						<div className="invalid-feedback">
-							Пароль не совпадают.
+							Пароли не совпадают.
 						</div>
 					</div>
 

@@ -2,9 +2,9 @@ const router = require('express').Router();
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 
-const db = require('../database/db');
-const mailManager = require('../modules/nodemailer');
-const validateCaptcha = require('../modules/validateCaptcha');
+const db = require('database/db');
+const mailManager = require('modules/nodemailer');
+const validateCaptcha = require('modules/validateCaptcha');
 
 router.get('/', (req, res) => {
 	if (req.user === undefined) {
@@ -30,9 +30,7 @@ router.get('/login', (req, res) => {
 	return res.redirect('/app');
 });
 
-router.get('/register', (req, res) => {
-	return res.render('index');
-});
+router.get('/register', (req, res) => res.render('index'));
 
 router.get('/register/success', (req, res) => {
 	if (req.user === undefined) {
@@ -54,12 +52,12 @@ router.post('/register', async (req, res) => {
 	const captchaResponseObject = await validateCaptcha(captchaResponse);
 
 	if (
-		registrationLoginField.length >= 4 && !/^\d+$/.test(registrationLoginField.charAt(0)) // Login
+		registrationLoginField.length >= 4 && !/[а-яёіїґ]/gi.test(registrationLoginField) // Login
 		&& /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(registrationEmailField) // Email
 		&& registrationPasswordField === registrationConfirmPasswordField // Password
 		&& captchaResponseObject.success // Captcha
 	) {
-		db.query(`SELECT * FROM users WHERE username='${registrationLoginField}'`, (findUserErr, val) => {
+		db.query('SELECT * FROM users WHERE username = ?', [registrationLoginField], (findUserErr, val) => {
 			if (findUserErr) {
 				return res.sendStatus(500);
 			}
@@ -99,9 +97,7 @@ router.post('/register', async (req, res) => {
 								to: registrationEmailField,
 								subject: 'Подтверждение аккаунта',
 								text: `Пожалуйста, подтвердите свой аккаунт по данной ссылке: ${appDomain}/activate/${userActivationHash}\n------------\nС уважением,\nАдминистрация IPTVPLC`
-							}, () => {
-								return res.sendStatus(201);
-							});
+							}, () => res.sendStatus(201));
 						});
 					});
 				});
@@ -117,13 +113,9 @@ router.post('/register', async (req, res) => {
 });
 
 router.get('/activate/:hash', (req, res) => {
-	db.query(`SELECT * FROM users WHERE activation_hash = '${req.params.hash}'`, (err, val) => {
-		if (err) {
-			return res.sendStatus(500);
-		}
-
+	db.query('SELECT * FROM users WHERE activation_hash = ?', [req.params.hash], (err, val) => {
 		if (val.length > 0 && val[0].active === 0) {
-			db.query(`UPDATE users SET active = 1 WHERE activation_hash = '${req.params.hash}'`, (error) => {
+			db.query('UPDATE users SET active = 1 WHERE activation_hash = ?', [req.params.hash], (error) => {
 				if (error) {
 					return res.sendStatus(500);
 				}
@@ -132,10 +124,13 @@ router.get('/activate/:hash', (req, res) => {
 					if (loginErr) {
 						return res.sendStatus(500);
 					}
-		
+
 					return res.redirect('/app');
 				});
 			});
+		}
+		else {
+			return res.sendStatus(500);
 		}
 	});
 });

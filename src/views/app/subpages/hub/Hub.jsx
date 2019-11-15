@@ -1,18 +1,18 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
-import Modal from '../../../../components/Modal/Modal';
-import Card from '../../../../components/Card/Card';
-import Loading from '../../../../components/Loading/Loading';
+import Modal from 'components/Modal/Modal';
+import Card from 'components/Card/Card';
+import Loading from 'components/Loading/Loading';
 
 import HubColumn from './components/HubColumn';
 import ToolsColumn from './components/columns/ToolsColumn';
 import RecentPlaylistsColumn from './components/columns/RecentPlaylistsColumn';
 
-import isUserLoggedIn from '../../../../assets/js/isUserLoggedIn';
-import fetchApi from '../../../../assets/js/fetchApi';
-import parseM3U from '../../../../assets/js/parseM3U';
-import isPlaylistMimeTypeValid from '../../../../assets/js/isPlaylistMimeTypeValid';
+import isUserLoggedIn from 'assets/js/isUserLoggedIn';
+import fetchApi from 'assets/js/fetchApi';
+import parseM3U from 'assets/js/parseM3U';
+import isPlaylistMimeTypeValid from 'assets/js/isPlaylistMimeTypeValid';
 
 class Hub extends Component {
 	constructor(props) {
@@ -232,6 +232,7 @@ class Hub extends Component {
 	renamePlaylistRequest(playlistId) {
 		const playlists = this.state.recentPlaylists;
 		const requestedPlaylistIndex = playlists.findIndex(item => item.id === playlistId);
+		const playlistFilenameData = playlists[requestedPlaylistIndex].filename.split(/\./);
 
 		this.setState({
 			isModalOpen: true,
@@ -243,10 +244,10 @@ class Hub extends Component {
 							type="text"
 							className="form-control"
 							id="playlistNewNameInput"
-							defaultValue={playlists[requestedPlaylistIndex].filename.split(/\.m3u8?$/, 1)[0]}
+							defaultValue={playlistFilenameData[0]}
 							maxLength="255" />
 						<div className="input-group-append">
-							<span className="input-group-text">{playlists[requestedPlaylistIndex].filename.match(/\.m3u8?$/)[0]}</span>
+							<span className="input-group-text">{playlistFilenameData[playlistFilenameData.length-1] !== playlistFilenameData[0] ? playlistFilenameData[playlistFilenameData.length-1] : '.m3u'}</span>
 						</div>
 					</div>
 				</div>
@@ -269,6 +270,8 @@ class Hub extends Component {
 
 		const playlists = this.state.recentPlaylists;
 		const requestedPlaylistIndex = playlists.findIndex(item => item.id === playlistId);
+		const playlistFilenameData = playlists[requestedPlaylistIndex].filename.split(/\./);
+		const playlistExtension = playlistFilenameData[playlistFilenameData.length-1];
 
 		if (inputValue.value !== '') {
 			isUserLoggedIn().then(async () => {
@@ -279,7 +282,7 @@ class Hub extends Component {
 					},
 					body: JSON.stringify({
 						id: playlistId,
-						newPlaylistName: `${inputValue.value}${playlists[requestedPlaylistIndex].filename.match(/\.m3u8?$/)[0]}`
+						newPlaylistName: `${inputValue.value}.${playlistExtension === inputValue.value ? 'm3u' : playlistExtension}`
 					})
 				})
 				.then(response => {
@@ -431,14 +434,13 @@ class Hub extends Component {
 				body: formData
 			});
 			const res = await this.createPlaylistModalResponse(req);
-
 			this.props.onSetPlaylistData(res.newPlaylistId);
 		});
 	}
 
 	render() {
 		return (
-			<Fragment>
+			<>
 				<div className="content container">
 					{!this.state.isRecentPlaylistsLoading ? (
 						<Card bodyStyle={{ display: 'inline-flex' }}>
@@ -501,7 +503,7 @@ class Hub extends Component {
 					onChange={this.onOpenPlaylist} />
 
 				{this.state.isModalOpen && <Modal {...this.state.modalData}>{this.state.modalContent}</Modal>}
-			</Fragment>
+			</>
 		);
 	}
 }
@@ -509,13 +511,6 @@ class Hub extends Component {
 export default connect(
 	state => ({ appStore: state }),
 	dispatch => ({
-		setAppSubpage: newSubpage => {
-			dispatch({
-				type: 'SET_APP_SUBPAGE',
-				payload: newSubpage
-			});
-		},
-
 		onSetPlaylistData: playlistId => {
 			dispatch({
 				type: 'SET_APP_SUBPAGE',
@@ -538,6 +533,7 @@ export default connect(
 				})
 				.then(response => {
 					const parsedResponse = parseM3U(response.data);
+					
 					dispatch({
 						type: 'SET_PLAYLIST',
 						payload: {

@@ -7,9 +7,11 @@ const {
 } = process.env;
 
 module.exports.create = () => {
-	let mailConfig = {
+	const mailPort = parseInt(MAIL_PORT, 10);
+
+	const mailConfig = {
 		host: MAIL_HOST,
-		port: parseInt(MAIL_PORT, 10),
+		port: mailPort,
 		secure: true,
 		tls: {
 			rejectUnauthorized: false
@@ -18,18 +20,8 @@ module.exports.create = () => {
 			user: MAIL_USER,
 			pass: MAIL_PASS
 		},
-		sendmail: true
+		sendmail: process.env.NODE_ENV === 'production'
 	};
-
-	if (MAIL_HOST === 'smtp.gmail.com') {
-		mailConfig = {
-			service: 'Gmail',
-			auth: {
-				user: MAIL_USER,
-				pass: MAIL_PASS
-			}
-		};
-	}
 
 	transporter = nodemailer.createTransport(mailConfig);
 };

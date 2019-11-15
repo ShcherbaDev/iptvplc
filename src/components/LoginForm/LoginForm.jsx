@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 
 class LoginForm extends Component {
 	constructor(props) {
@@ -48,7 +48,7 @@ class LoginForm extends Component {
 
 	render() {
 		return (
-			<Fragment>
+			<>
 				{this.state.isIncorrect && (
 					<div className="alert alert-danger">
 						Неверное имя пользователя или пароль!
@@ -70,7 +70,7 @@ class LoginForm extends Component {
 						<a href="/register">Зарегистрироватся</a>
 					</div>
 				</form>
-			</Fragment>
+			</>
 		);
 	}
 }

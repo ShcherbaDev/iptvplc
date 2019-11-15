@@ -4,10 +4,12 @@ const fs = require('fs');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const bcrypt = require('bcryptjs');
-const mailManager = require('../modules/nodemailer');
-const validateCaptcha = require('../modules/validateCaptcha');
 
-const db = require('../database/db');
+const mailManager = require('modules/nodemailer');
+const validateCaptcha = require('modules/validateCaptcha');
+const encodeM3U = require('modules/encodeM3U');
+
+const db = require('database/db');
 
 passport.use(new LocalStrategy((username, password, done) => {
 	db.query(`SELECT * FROM users WHERE username='${username}'`, async (err, user) => {
@@ -21,14 +23,10 @@ passport.use(new LocalStrategy((username, password, done) => {
 	});
 }));
 
-passport.serializeUser((user, done) => {
-	return done(null, user);
-});
+passport.serializeUser((user, done) => done(null, user));
 
 passport.deserializeUser((user, done) => {
-	db.query(`SELECT * FROM users WHERE id='${user.id}'`, (err, queryUser) => {
-		return done(err, queryUser);
-	});
+	db.query('SELECT * FROM users WHERE id = ?', [user.id], (err, queryUser) => done(err, queryUser));
 });
 
 // Login
@@ -39,7 +37,7 @@ router.get('/login', (req, res) => {
 			...req.user[0]
 		});
 	}
-	
+
 	return res.send({ isLoggedIn: false });
 });
 
@@ -82,31 +80,29 @@ router.post('/upload', (req, res) => {
 
 		if (
 			process.env.PLAYLIST_ACCEPTABLE_MIME_TYPES
-			.includes(
-				headers['content-type']
-			)
+				.includes(
+					headers['content-type']
+				)
 		) {
 			return fs.readFile(path, (readErr, data) => {
 				if (readErr) {
 					return res.sendStatus(500);
 				}
 
-				const fileData = `data:${headers['content-type']};base64,${new Buffer.from(data).toString('base64')}`;
+				const fileData = `data:${headers['content-type']};base64,${Buffer.from(data).toString('base64')}`;
 				return addPlaylist(originalFilename, headers['content-type'], fileData, req.user[0].id, res);
 			});
 		}
 
 		return res.sendStatus(400);
 	});
-})
+});
 
 router.use((req, res, next) => {
 	if (req.headers['content-type'] === 'application/json') {
-		next();
+		return next();
 	}
-	else {
-		return res.sendStatus(403);
-	}
+	return res.sendStatus(403);
 });
 
 // Logout
@@ -161,7 +157,7 @@ router.get('/playlist/:id', (req, res) => {
 		if (err) {
 			return res.sendStatus(500);
 		}
-		
+
 		const trueRes = {
 			...result[0],
 			data: Buffer.from(result[0].data, 'base64').toString('utf8')
@@ -173,15 +169,13 @@ router.get('/playlist/:id', (req, res) => {
 
 router.post('/createPlaylist', (req, res) => {
 	const { user_id, file_name, file_data } = req.body;
-	
+
 	const playlistMimeType = getPlaylistMimeType(file_data);
-	
+
 	if (playlistMimeType !== null) {
 		return addPlaylist(file_name, playlistMimeType, file_data, user_id, res);
 	}
-	else {
-		return res.sendStatus(400);
-	}
+	return res.sendStatus(400);
 });
 
 router.put('/renamePlaylist', (req, res) => {
@@ -189,7 +183,7 @@ router.put('/renamePlaylist', (req, res) => {
 	const CURRENT_TIMESTAMP = { toSqlString: () => 'CURRENT_TIMESTAMP()' };
 
 	const query = 'UPDATE `playlists` SET filename = ?, last_edit_date = ? WHERE id = ?';
-	const queryArgs = [newPlaylistName, CURRENT_TIMESTAMP, id]
+	const queryArgs = [newPlaylistName, CURRENT_TIMESTAMP, id];
 
 	db.query(query, queryArgs, (err) => {
 		if (err) {
@@ -197,7 +191,7 @@ router.put('/renamePlaylist', (req, res) => {
 		}
 		return res.status(200).send({ newPlaylistName });
 	});
-})
+});
 
 router.post('/deletePlaylist', (req, res) => {
 	const { id } = req.body;
@@ -216,14 +210,16 @@ router.put('/savePlaylist', (req, res) => {
 	const { playlist_id, new_data } = req.body;
 	const CURRENT_TIMESTAMP = { toSqlString: () => 'CURRENT_TIMESTAMP()' };
 
+	const encodedData = encodeM3U(new_data);
+
 	const query = 'UPDATE `playlists` SET data = ?, last_edit_date = ? WHERE id = ?';
-	const queryArgs = [new_data, CURRENT_TIMESTAMP, playlist_id];
+	const queryArgs = [encodedData, CURRENT_TIMESTAMP, playlist_id];
 
 	db.query(query, queryArgs, (err) => {
 		if (err) {
 			return res.sendStatus(500);
 		}
-		return res.status(200).send(new_data);
+		return res.status(200).send(encodedData);
 	});
 });
 
@@ -234,8 +230,8 @@ router.post('/sendMail', async (req, res) => {
 	} = req.body;
 
 	const subjectText = pageFrom === '/'
-		? `${name} (${email}) отправил(-а) сообщение через форму обратной связи на главной странице`
-		: `Пользователь ${name} (${email}) отправил(-а) сообщение`;
+		? `Неавторизованный пользователь ${name} (${email}) отправил(-а) сообщение`
+		: `Авторизированный пользователь ${name} (${email}) отправил(-а) сообщение через форму обратной связи`;
 
 	function sendMail() {
 		return new Promise((resolve, reject) => {
@@ -247,7 +243,7 @@ router.post('/sendMail', async (req, res) => {
 				subject: subjectText,
 				text: message
 			}, (err) => {
-				if (err) {
+				if (err !== null) {
 					reject(err);
 				}
 				resolve();

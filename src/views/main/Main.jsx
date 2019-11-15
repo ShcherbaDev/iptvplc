@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 
 import './assets/css/styles.scss';
 
@@ -17,7 +17,7 @@ class Main extends Component {
 
 	render() {
 		return (
-			<Fragment>
+			<>
 				<ul className="nav justify-content-center">
 					<li className="nav-item">
 						<a href="#about" className="nav-link">О приложении</a>
@@ -30,7 +30,7 @@ class Main extends Component {
 				<Header />
 				<About />
 				<Contact />
-			</Fragment>
+			</>
 		);
 	}
 }

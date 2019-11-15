@@ -4,9 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "webpack --config ./webpack.config.prod.js",
+    "build": "npm run lint && webpack --config ./webpack.config.prod.js",
     "dev": "webpack --config ./webpack.config.dev.js --watch",
-    "prod": "node ./dist/server.js",
     "lint": "eslint ./src/",
     "lint:fix": "eslint ./src/ --fix",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -16,6 +15,7 @@
   "dependencies": {
     "@babel/runtime": "^7.6.3",
     "@types/socket.io-client": "^1.4.32",
+    "array-move": "^2.2.0",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
     "cookie-parser": "^1.4.4",

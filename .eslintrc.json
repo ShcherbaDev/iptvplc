@@ -34,6 +34,8 @@
         "no-restricted-globals": "off",
         "camelcase": "off",
         "linebreak-style": ["error", "windows"],
+        "import/no-unresolved": "off",
+        "consistent-return": "off",
 
         "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
         "react/jsx-indent": ["error", "tab"]

@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
 class SimpleChannel extends Component {
@@ -8,7 +8,7 @@ class SimpleChannel extends Component {
 
 	render() {
 		return (
-			<Fragment>
+			<>
 				<div className="form-group">
 					<label htmlFor="channelName">Название:</label>
 					<input type="text" id="channelName" className="form-control"
@@ -27,7 +27,7 @@ class SimpleChannel extends Component {
 						required 
 						onChange={e => this.props.onSetPreviewData('url', e.target.value)} />
 				</div>
-			</Fragment>
+			</>
 		);
 	}
 }

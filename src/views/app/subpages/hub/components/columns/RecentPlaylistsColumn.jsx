@@ -26,9 +26,7 @@ class RecentPlaylistsColumn extends Component {
 
 		if (val !== '') {
 			currentList = recentPlaylists;
-			newList = currentList.filter(item => {
-				return item.filename.includes(val.toLowerCase())
-			});
+			newList = currentList.filter(item => item.filename.includes(val));
 		} 
 		else {
 			newList = recentPlaylists;

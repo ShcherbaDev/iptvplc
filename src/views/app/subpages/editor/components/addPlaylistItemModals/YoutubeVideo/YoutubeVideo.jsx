@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
 import YoutubeVideoPreview from './YoutubeVideoPreview';
@@ -10,7 +10,7 @@ class YoutubeVideo extends Component {
 
 	render() {
 		return (
-			<Fragment>
+			<>
 				<div className="form-group">
 					<label htmlFor="youtubeVideoUrl">URL видео:</label>
 					<input type="url" id="youtubeVideoUrl"
@@ -20,7 +20,7 @@ class YoutubeVideo extends Component {
 						onChange={e => this.props.onSetPreviewData(e.target.value)} />
 				</div>
 				<YoutubeVideoPreview />
-			</Fragment>
+			</>
 		);
 	}
 }

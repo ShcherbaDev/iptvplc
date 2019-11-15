@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 
-import isUserLoggedIn from '../assets/js/isUserLoggedIn';
+import isUserLoggedIn from 'assets/js/isUserLoggedIn';
 
 // Components
-import Header from '../components/Header/Header';
+import Header from 'components/Header/Header';
 
 // Pages
 import Main from './main/Main';

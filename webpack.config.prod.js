@@ -7,7 +7,6 @@ const TerserPlugin = require('terser-webpack-plugin');
 module.exports = {
 	mode: 'production',
 	entry: {
-		'static/bootstrap': './src/assets/js/bootstrap.bundle.min.js',
 		'static/main': './src/assets/js/main.js',
 		server: './src/server.js'
 	},
@@ -22,7 +21,16 @@ module.exports = {
         __filename: false
     },
 	resolve: {
-		extensions: ['.js', '.jsx', '.']
+		extensions: ['.js', '.jsx', '.'],
+		alias: {
+			assets: path.resolve(__dirname, 'src/assets'),
+			components: path.resolve(__dirname, 'src/components'),
+			database: path.resolve(__dirname, 'src/database'),
+			modules: path.resolve(__dirname, 'src/modules'),
+			routes: path.resolve(__dirname, 'src/routes'),
+			store: path.resolve(__dirname, 'src/store'),
+			views: path.resolve(__dirname, 'src/views'),
+		}
 	},
 	optimization: {
 		minimizer: [

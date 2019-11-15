@@ -8,14 +8,14 @@ import { createStore, combineReducers } from 'redux';
 import { Provider } from 'react-redux';
 
 // Redux reducers
-import appReducer from '../../store/reducers/appReducer';
+import appReducer from 'store/reducers/appReducer';
 
 // Adding components
-import Site from '../../views/Site';
+import Site from 'views/Site';
 
 // Adding styles
-import '../styles/bootstrap.min.css';
-import '../styles/styles.scss';
+import 'assets/styles/bootstrap.min.css';
+import 'assets/styles/styles.scss';
 
 const rootReducer = combineReducers({
 	appReducer

@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import { connect } from 'react-redux';
 
 import ImagePreview from './ImagePreview';
@@ -10,7 +10,7 @@ class Image extends Component {
 
 	render() {
 		return (
-			<Fragment>
+			<>
 				<div className="form-group">
 					<label htmlFor="imageUrl">URL картинки:</label>
 					<input type="url" id="imageUrl"
@@ -19,7 +19,7 @@ class Image extends Component {
 						onChange={e => this.props.onSetPreviewData(e.target.value)} />
 				</div>
 				<ImagePreview />
-			</Fragment>
+			</>
 		);
 	}
 }

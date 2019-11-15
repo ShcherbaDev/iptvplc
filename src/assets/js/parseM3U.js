@@ -1,14 +1,16 @@
 /**
- * Парсер создан на основе кода от sajjadjaved01:
+ * Parser was based on the solution by sajjadjaved01:
  * https://github.com/sajjadjaved01/iptv/blob/master/app/src/main/java/com/muparse/M3UParser.java
  */
 
 export default function parseM3U(string) {
+	const regexp = new RegExp(`^data:(${playlist_acceptable_mime_types.join('|')});base64,`);
+
 	const decodedPlaylistString = decodeURIComponent(
 		escape(
-			/^data:audio\/x-mpegurl;base64,/.test(string) ? atob(
+			regexp.test(string) ? atob(
 				string.replace(
-					'data:audio/x-mpegurl;base64,', ''
+					regexp, ''
 				)
 			) : ''
 		)

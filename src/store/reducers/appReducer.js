@@ -80,66 +80,6 @@ export default function appReducer(state = initialState, action) {
 				}
 			};
 
-		case 'CHANGE_PLAYLIST_ITEM': {
-			const { playlistItemIndex, key, newValue } = action.payload;
-
-			return {
-				...state,
-				playlist: {
-					...state.playlist,
-					data: state.playlist.data.map((item, index) => {
-						if (index === playlistItemIndex) {
-							return {
-								...item,
-								[key]: newValue
-							};
-						}
-						return item;
-					})
-				}
-			};
-		}
-
-		case 'CHANGE_YOUTUBE_PLAYLIST_ITEM': {
-			const { playlistItemIndex, newVideoData } = action.payload;
-
-			return {
-				...state,
-				playlist: {
-					...state.playlist,
-					data: state.playlist.data.map((item, index) => {
-						if (index === playlistItemIndex) {
-							return {
-								...item,
-								...newVideoData
-							};
-						}
-						return item;
-					})
-				}
-			};
-		}
-
-		case 'CHNAGE_IMAGE_PLAYLIST_ITEM': {
-			const { playlistItemIndex, newImageData } = action.payload;
-
-			return {
-				...state,
-				playlist: {
-					...state.playlist,
-					data: state.playlist.data.map((item, index) => {
-						if (index === playlistItemIndex) {
-							return {
-								...item,
-								...newImageData
-							};
-						}
-						return item;
-					})
-				}
-			};
-		}
-
 		case 'CLEAR_PREVIEW_DATA':
 			return {
 				...state,
@@ -148,21 +88,6 @@ export default function appReducer(state = initialState, action) {
 					icon: '',
 					url: '',
 					channel: ''
-				}
-			};
-
-		case 'ADD_PLAYLIST_ITEM':
-			return {
-				...state,
-				playlist: {
-					...state.playlist,
-					data: [
-						...state.playlist.data,
-						{
-							...action.payload,
-							id: state.playlist.data.length
-						}
-					]
 				}
 			};
 

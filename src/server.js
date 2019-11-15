@@ -10,10 +10,10 @@ const passport = require('passport');
 
 const app = express();
 
-const indexRouter = require('./routes/index');
-const apiRouter = require('./routes/api');
+const indexRouter = require('routes/index');
+const apiRouter = require('routes/api');
 
-const mailManager = require('./modules/nodemailer');
+const mailManager = require('modules/nodemailer');
 
 const port = process.env.APP_PORT || 3000;
 
@@ -39,7 +39,7 @@ if (process.env.NODE_ENV === 'development') {
 	app.use(express.static('dist'));
 }
 else {
-	app.use('/static', express.static('static'));
+	app.use('/static', express.static(`${__dirname}/static`));
 }
 
 app.engine('html', require('ejs').renderFile);
@@ -52,6 +52,4 @@ app.set('view options', {
 
 mailManager.create();
 
-app.listen(port, () => {
-	console.log(`App listening on port ${port}\nPress Ctrl+C to quit.`);
-});
+app.listen(port);

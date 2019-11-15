@@ -4,8 +4,8 @@ import './Header.scss';
 
 import Modal from '../Modal/Modal';
 
-import isUserLoggedIn from '../../assets/js/isUserLoggedIn';
-import fetchApi from '../../assets/js/fetchApi';
+import isUserLoggedIn from 'assets/js/isUserLoggedIn';
+import fetchApi from 'assets/js/fetchApi';
 
 class Header extends Component {
 	constructor(props) {
@@ -76,11 +76,11 @@ class Header extends Component {
 					pageFrom: '/app'
 				})
 			})
-				.then(() => {
-					alert('Сообщение было успешно отправлено!');
-				})
-				.catch(() => {
-					alert('Во время отправки сообщения произошла ошибка.\nПожалуйста, попробуйте ещё раз.');
+				.then(resp => {
+					if (resp.ok) {
+						return alert('Сообщение было успешно отправлено!');
+					}
+					return alert('Во время отправки сообщения произошла ошибка.\nПожалуйста, попробуйте ещё раз.');
 				});
 		}
 		else {
