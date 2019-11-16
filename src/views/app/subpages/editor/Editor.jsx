@@ -16,6 +16,7 @@ import ImageModal from './components/addPlaylistItemModals/Image/Image';
 
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import arrayMove from 'array-move';
+import ShortUniqueId from 'short-unique-id';
 
 class Editor extends Component {
 	constructor(props) {
@@ -94,7 +95,7 @@ class Editor extends Component {
 		const newData = this.state.playlist.data.concat({
 			name, icon, url, type,
 			duration: -1,
-			id: this.state.playlist.data.length
+			id: new ShortUniqueId().randomUUID(6)
 		});
 
 		this.setState({
@@ -121,17 +122,25 @@ class Editor extends Component {
 							<button
 								className="btn btn-block btn-outline-success"
 								onClick={() => {
-									const iconUrlRegex = /(https?:\/\/.*\.(?:png|jpg|gif|svg|webp))/i;
-									const channelUrlRegex = /^https?:\/\/([\w\d\-]+\.)+\w{2,}(\/.+)?$/;
+									const iconUrlRegex = /^(https?:)([/|.|\w|\s|-])*\.(?:png|jpg|gif|svg|webp)$/i;
+									const channelUrlRegex = /^((http(s)?(\:\/\/))+(www\.)?([\w\-\.\/])*(\.[a-zA-Z]{2,3}\/?))[^\s\b\n|]*[^.,;:\?\!\@\^\$ -]$/g;
+
+									let iconUrl = `${window.location.origin}/static/images/nopic.jpg`;
 
 									if (
 										this.props.appStore.previewData.name !== ''
-										&& iconUrlRegex.test(this.props.appStore.previewData.icon)
 										&& channelUrlRegex.test(this.props.appStore.previewData.url)
 									) {
+										if (this.props.appStore.previewData.icon !== '' && iconUrlRegex.test(this.props.appStore.previewData.icon)) {
+											iconUrl = this.props.appStore.previewData.icon;
+										}
+										else {
+											document.getElementById('channelIcon').focus();
+										}
+
 										this.addPlaylistItem(
 											this.props.appStore.previewData.name,
-											this.props.appStore.previewData.icon,
+											iconUrl,
 											this.props.appStore.previewData.url,
 											'simpleChannel'
 										);
@@ -141,9 +150,6 @@ class Editor extends Component {
 									else {
 										if (this.props.appStore.previewData.name === '') 
 											document.getElementById('channelName').focus();
-
-										if (!iconUrlRegex.test(this.props.appStore.previewData.icon)) 
-											document.getElementById('channelIcon').focus();
 
 										if (!channelUrlRegex.test(this.props.appStore.previewData.url))
 											document.getElementById('channelUrl').focus();

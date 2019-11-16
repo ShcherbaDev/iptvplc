@@ -47,7 +47,8 @@
     "react-router-dom": "^5.1.2",
     "react-sortable-hoc": "^1.10.1",
     "redux": "^4.0.4",
-    "sass-loader": "^7.3.1"
+    "sass-loader": "^7.3.1",
+    "short-unique-id": "^1.1.1"
   },
   "devDependencies": {
     "@babel/cli": "^7.6.4",

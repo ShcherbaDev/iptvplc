@@ -3,6 +3,8 @@
  * https://github.com/sajjadjaved01/iptv/blob/master/app/src/main/java/com/muparse/M3UParser.java
  */
 
+import ShortUniqueId from 'short-unique-id';
+
 export default function parseM3U(string) {
 	const regexp = new RegExp(`^data:(${playlist_acceptable_mime_types.join('|')});base64,`);
 
@@ -58,7 +60,7 @@ export default function parseM3U(string) {
 				}
 
 				result.push({
-					id: result.length,
+					id: new ShortUniqueId().randomUUID(6),
 					active: false,
 					duration,
 					icon,
