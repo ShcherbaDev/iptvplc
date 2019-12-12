@@ -12,10 +12,28 @@ class Contact extends Component {
 			message: ''
 		};
 	}
+
+	componentDidMount() {
+		const documentHeight = document.documentElement.clientHeight || document.body.clientHeight;
+		const footerInfoBlock = document.querySelector('section#contact');
+		const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+
+		// Initializing
+		footerInfoBlock.querySelector('.section-background').style.backgroundPositionY = `${(documentHeight-scrollTop)/25}%`;
+
+		window.addEventListener('scroll', () => {
+			const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+
+			// Parallax optimization
+			if (scrollTop >= documentHeight) {
+				footerInfoBlock.querySelector('.section-background').style.backgroundPositionY = `${(documentHeight-scrollTop)/25}%`;
+			}
+		});
+	}
 	
 	sendMail(event) {
 		event.preventDefault();
-		
+
 		const captchaResponse = grecaptcha.getResponse();
 
 		if (captchaResponse !== '') {

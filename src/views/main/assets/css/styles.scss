@@ -45,6 +45,8 @@ section {
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
+
+		position: relative;
 	}
 }
 
@@ -196,6 +198,10 @@ section:not(.main) {
 
 section.contact {
 	background-color: transparent;
+
+	.section-title {
+		position: relative;
+	}
 
 	.section-content {
 		margin-top: 0;

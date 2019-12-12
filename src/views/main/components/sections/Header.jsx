@@ -3,6 +3,25 @@ import React, { Component } from 'react';
 import Section from '../Section';
 
 class Header extends Component {
+	componentDidMount() {
+		const documentHeight = document.documentElement.clientHeight || document.body.clientHeight;
+		const headerInfoBlock = document.querySelector('section.main > .container');
+		const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+
+		// Initializing
+		headerInfoBlock.style.top = `${Math.floor(scrollTop/6)}px`;
+
+		window.addEventListener('scroll', () => {
+			const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+
+			// Parallax optimization
+			if (scrollTop <= documentHeight) {
+				// Math.floor method was used here for prevent shaking of a logo
+				headerInfoBlock.style.top = `${Math.floor(scrollTop/6)}px`;
+			}
+		});
+	}
+
 	render() {
 		return (
 			<Section className="main">
