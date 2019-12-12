@@ -15,7 +15,7 @@ class Header extends Component {
 			const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
 
 			// Parallax optimization
-			if (scrollTop <= documentHeight) {
+			if (scrollTop <= documentHeight && document.body.clientWidth >= 991) {
 				// Math.floor method was used here for prevent shaking of a logo
 				headerInfoBlock.style.top = `${Math.floor(scrollTop/6)}px`;
 			}
