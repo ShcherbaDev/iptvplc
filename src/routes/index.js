@@ -114,6 +114,10 @@ router.post('/register', async (req, res) => {
 
 router.get('/activate/:hash', (req, res) => {
 	db.query('SELECT * FROM users WHERE activation_hash = ?', [req.params.hash], (err, val) => {
+		if (err) {
+			return res.sendStatus(500);
+		}
+
 		if (val.length > 0 && val[0].active === 0) {
 			db.query('UPDATE users SET active = 1 WHERE activation_hash = ?', [req.params.hash], (error) => {
 				if (error) {
@@ -130,7 +134,7 @@ router.get('/activate/:hash', (req, res) => {
 			});
 		}
 		else {
-			return res.sendStatus(500);
+			return res.redirect('/app');
 		}
 	});
 });
