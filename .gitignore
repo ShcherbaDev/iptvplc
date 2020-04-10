@@ -9,5 +9,6 @@ dist/
 # Dependency directory
 node_modules/
 
-# dotenv environment variables file
-environments/
+# dotenv environment variables files
+.env.development
+.env.production
